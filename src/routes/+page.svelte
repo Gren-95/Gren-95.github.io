@@ -3,9 +3,10 @@
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { reveal } from '$lib/actions/reveal';
+	import { scrollProgress } from '$lib/actions/scrollProgress';
 	import { profile } from '$lib/data/profile';
 	import { contributions } from '$lib/data/contributions';
-	import { work, education, toolkit, languages, aiTools } from '$lib/data/qualifications';
+	import { work, education, languages } from '$lib/data/qualifications';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -29,7 +30,7 @@
 	<meta property="og:type" content="profile" />
 </svelte:head>
 
-<header class="topbar">
+<header class="topbar" use:scrollProgress>
 	<div class="shell bar">
 		<a class="wordmark" href="#top">{profile.handle}</a>
 		<nav class="nav">
@@ -44,7 +45,9 @@
 <main id="top">
 	<section class="shell hero">
 		{#if profile.available}
-			<p class="badge mono"><span class="dot" aria-hidden="true"></span> Open to work</p>
+			<p class="badge mono enter" style="--d: 0ms">
+				<span class="dot" aria-hidden="true"></span> Open to work
+			</p>
 		{/if}
 
 		<h1 class="name">
@@ -56,14 +59,14 @@
 			</span>
 		</h1>
 
-		<p class="role">
+		<p class="role enter" style="--d: 520ms">
 			{profile.role} at <a href={profile.employerUrl} rel="noopener">{profile.employer}</a>, based
 			in {profile.location}.
 		</p>
 
-		<p class="intro">{profile.intro}</p>
+		<p class="intro enter" style="--d: 600ms">{profile.intro}</p>
 
-		<div class="links">
+		<div class="links enter" style="--d: 680ms">
 			<a class="link" href={profile.github} rel="noopener">GitHub</a>
 			<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
 			<a class="link" href="mailto:{profile.email}">Email</a>
@@ -129,12 +132,19 @@
 			<p class="section-note">What I have actually put into production or into a homelab.</p>
 		</div>
 		<div class="tools">
-			{#each toolkit as group, index (group.heading)}
+			{#each data.toolkit as group, index (group.heading)}
 				<div class="tool-group" use:reveal={Math.min(index, 3) * 60}>
 					<h3 class="tool-heading">{group.heading}</h3>
 					<ul class="chips">
-						{#each group.tools as tool (tool)}
-							<li>{tool}</li>
+						{#each group.tools as tool (tool.name)}
+							<li class="chip" style="--brand: {tool.hex}; --on-brand: {tool.fg}">
+								{#if tool.path}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
+								{:else}
+									<span class="mark" aria-hidden="true">{tool.letter}</span>
+								{/if}
+								<span>{tool.name}</span>
+							</li>
 						{/each}
 					</ul>
 				</div>
@@ -143,8 +153,15 @@
 			<div class="tool-group" use:reveal>
 				<h3 class="tool-heading">AI tools</h3>
 				<ul class="chips">
-					{#each aiTools as tool (tool)}
-						<li>{tool}</li>
+					{#each data.aiTools as tool (tool.name)}
+						<li class="chip" style="--brand: {tool.hex}; --on-brand: {tool.fg}">
+							{#if tool.path}
+								<svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
+							{:else}
+								<span class="mark" aria-hidden="true">{tool.letter}</span>
+							{/if}
+							<span>{tool.name}</span>
+						</li>
 					{/each}
 				</ul>
 			</div>
@@ -179,8 +196,8 @@
 		border-bottom: 1px solid var(--rule);
 	}
 
-	/* Reading progress, driven entirely by CSS scroll-linked animation. Where
-	   scroll() timelines aren't supported the bar simply stays at scaleX(0). */
+	/* Reading progress. --read is written by the scrollProgress action; see
+	   there for why this isn't animation-timeline: scroll(). */
 	.topbar::after {
 		content: '';
 		position: absolute;
@@ -189,16 +206,8 @@
 		width: 100%;
 		height: 2px;
 		background: var(--accent);
-		transform: scaleX(0);
+		transform: scaleX(var(--read, 0));
 		transform-origin: 0 50%;
-		animation: read linear both;
-		animation-timeline: scroll(root block);
-	}
-
-	@keyframes read {
-		to {
-			transform: scaleX(1);
-		}
 	}
 
 	.bar {
@@ -257,14 +266,14 @@
 				color-mix(in oklab, var(--accent) 12%, transparent),
 				transparent 70%
 			);
-		opacity: 0.45;
+		opacity: 0.55;
 		filter: blur(6px);
-		animation: drift 24s ease-in-out infinite alternate;
+		animation: drift 13s ease-in-out infinite alternate;
 	}
 
 	@keyframes drift {
 		to {
-			transform: translate3d(2.5%, 1.5%, 0) scale(1.07);
+			transform: translate3d(6%, 3.5%, 0) scale(1.14);
 		}
 	}
 
@@ -297,6 +306,12 @@
 		display: inline-block;
 		animation: rise 0.75s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 		animation-delay: calc(var(--i) * 26ms);
+	}
+
+	/* Everything else in the hero follows the name in, one beat apart. */
+	.enter {
+		animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+		animation-delay: var(--d, 0ms);
 	}
 
 	@keyframes rise {
@@ -438,21 +453,51 @@
 		padding: 0;
 	}
 
-	.chips li {
-		border: 1px solid var(--rule-strong);
-		border-radius: 6px;
-		padding: 0.2rem 0.65rem;
+	/* Each chip wears its own brand: the logo is monochrome, drawn in whichever
+	   of black or white reads better on that brand colour. */
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		background: var(--brand);
+		color: var(--on-brand);
+		border-radius: 7px;
+		padding: 0.3rem 0.7rem 0.3rem 0.55rem;
 		font-size: var(--step--1);
+		font-weight: 500;
+		line-height: 1.5;
+		/* A hairline in the contrasting colour, so brands that are essentially
+		   black (Bun, Express, macOS, Cursor) stay defined on the dark theme. */
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--on-brand) 20%, transparent);
 		transition:
-			border-color 0.18s ease,
-			color 0.18s ease,
-			transform 0.18s ease;
+			transform 0.18s ease,
+			box-shadow 0.18s ease;
 	}
 
-	.chips li:hover {
-		border-color: var(--accent);
-		color: var(--accent);
-		transform: translateY(-2px);
+	.chip svg {
+		width: 1.05em;
+		height: 1.05em;
+		fill: currentColor;
+		flex: none;
+	}
+
+	.chip .mark {
+		width: 1.05em;
+		height: 1.05em;
+		display: grid;
+		place-items: center;
+		border: 1.5px solid currentColor;
+		border-radius: 3px;
+		font-size: 0.78em;
+		font-weight: 700;
+		flex: none;
+	}
+
+	.chip:hover {
+		transform: translateY(-3px);
+		box-shadow:
+			inset 0 0 0 1px color-mix(in oklab, var(--on-brand) 20%, transparent),
+			0 7px 20px -7px color-mix(in oklab, var(--brand) 80%, transparent);
 	}
 
 	.spoken {
@@ -488,7 +533,8 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.letter {
+		.letter,
+		.enter {
 			animation: none;
 		}
 
@@ -496,11 +542,7 @@
 			animation: none;
 		}
 
-		.topbar::after {
-			display: none;
-		}
-
-		.chips li:hover {
+		.chip:hover {
 			transform: none;
 		}
 	}
