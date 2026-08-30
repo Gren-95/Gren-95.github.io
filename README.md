@@ -93,6 +93,23 @@ Type is Bricolage Grotesque (display), Archivo (body), and Spline Sans Mono
 (dates and tags). Nothing on the page is set below 14px. Light and dark both
 ship; the choice is stored per browser and settled before first paint.
 
+### Motion
+
+Every effect is a progressive enhancement, and all of them are dropped under
+`prefers-reduced-motion: reduce`.
+
+| Effect                                                  | Built with                           | Without support  |
+| ------------------------------------------------------- | ------------------------------------ | ---------------- |
+| Theme change wipes in as a circle grown from the toggle | View Transitions API                 | instant swap     |
+| Sun retracts its rays into a crescent                   | CSS transitions on SVG `cx`/`cy`/`r` | —                |
+| Reading progress bar under the header                   | `animation-timeline: scroll()`       | bar stays hidden |
+| Highlight tracking the cursor across project cards      | `pointermove` writing `--px`/`--py`  | no highlight     |
+| Name assembles letter by letter                         | staggered `animation-delay`          | —                |
+| Ambient wash drifting behind the hero                   | animated radial gradients            | static gradient  |
+
+The hero wash is deliberately faint: measured over its strongest point, muted
+text still reads at 6.5:1 against AA's 4.5:1 floor.
+
 ## Deployment
 
 `.github/workflows/deploy.yml` runs on every push to `main`: install, format

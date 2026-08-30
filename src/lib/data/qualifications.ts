@@ -13,14 +13,14 @@ export const work: Post[] = [
 		period: 'Feb 2024 — present',
 		title: 'Junior Web Developer',
 		place: 'JELD-WEN Eesti AS',
-		placeUrl: 'https://www.jeld-wen.com/',
+		placeUrl: 'https://www.swedoor.ee/',
 		detail: 'Building web applications and keeping the IT infrastructure behind them running.'
 	},
 	{
 		period: '2022 — Feb 2024',
 		title: 'IT Support Technician',
 		place: 'JELD-WEN Eesti AS',
-		placeUrl: 'https://www.jeld-wen.com/',
+		placeUrl: 'https://www.swedoor.ee/',
 		detail: 'Three internships at the same company, which turned into the developer post above.'
 	}
 ];
@@ -89,6 +89,10 @@ export const toolkit: ToolGroup[] = [
 		]
 	},
 	{
+		heading: 'Editors and tooling',
+		tools: ['Git', 'VS Code', 'VSCodium', 'Trello']
+	},
+	{
 		heading: 'Infrastructure and automation',
 		tools: [
 			'Docker',
@@ -104,6 +108,8 @@ export const toolkit: ToolGroup[] = [
 		]
 	}
 ];
+
+export const aiTools = ['Claude', 'Cursor'];
 
 export const languages = [
 	{ name: 'Estonian', level: 'Native' },

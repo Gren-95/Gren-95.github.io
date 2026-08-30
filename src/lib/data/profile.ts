@@ -7,7 +7,7 @@ export const profile = {
 	handle: 'Gren95',
 	role: 'Junior Web Developer',
 	employer: 'JELD-WEN Eesti AS',
-	employerUrl: 'https://www.jeld-wen.com/',
+	employerUrl: 'https://www.swedoor.ee/',
 	location: 'Rakvere, Estonia',
 	intro:
 		'I build web applications, maintain IT infrastructure, and work on homelab and open source projects in my spare time.',
