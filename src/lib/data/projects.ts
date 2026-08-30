@@ -1,51 +1,53 @@
 import type { CuratedProject } from '$lib/types/project';
 
 /**
- * Six projects, newest activity first README, newest activity first.
- * Live language, stars and last-push data are merged in at build time by
- * src/routes/+page.server.ts.
+ * Six projects, newest activity first. Each summary states the problem, what
+ * was built, and what came of it — reviewers skim, so the point goes first.
+ *
+ * Live language, stars, last-push dates and demo links are merged in at build
+ * time by src/routes/+page.server.ts.
  */
 export const projects: CuratedProject[] = [
 	{
 		repo: 'hyprland-dots',
 		period: '2025—2026',
 		summary:
-			'A complete Hyprland desktop written in QML — bar, notifications, launcher, and on-screen displays are all native, not assembled from other people’s widgets.',
+			'Most Hyprland setups stitch together other people’s widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead — bar, notifications, launcher, on-screen displays — so it behaves as one piece. It is what I run every day.',
 		exposes: ['QML', 'Quickshell', 'Hyprland', 'Wayland']
 	},
 	{
 		repo: 'tailboard',
 		period: '2026',
 		summary:
-			'A self-hosted dashboard for a homelab: every service you run gathered onto one page you would actually leave open.',
+			'A dozen self-hosted services means a dozen bookmarks and no idea which one is down. Tailboard puts them all on one page with their status, so the homelab has a front door instead of a folder of links.',
 		exposes: ['self-hosted', 'homelab', 'dashboard']
 	},
 	{
 		repo: 'sonic-siphon',
 		period: '2025—2026',
 		summary:
-			'Paste a YouTube playlist and get MP3 files back. One Go binary you host yourself, so nothing passes through anybody else’s server.',
+			'Every YouTube-to-MP3 site is an ad farm that wants your links on its server. This is one Go binary you run yourself: paste a playlist, get the files back, nothing leaves your machine.',
 		exposes: ['Go', 'single binary', 'self-hosted']
 	},
 	{
 		repo: 'spawnpoint',
 		period: '2026',
 		summary:
-			'Start, stop, and back up Minecraft servers from a browser, instead of opening an SSH session every time a friend wants a world spun up.',
+			'Friends kept asking me to spin up Minecraft worlds, which meant an SSH session every time. Spawnpoint puts start, stop, backups and the server console in a browser, so they can do it without me.',
 		exposes: ['TypeScript', 'self-hosted', 'backups', 'console']
 	},
 	{
 		repo: 'ha-elering-ee',
 		period: '2026',
 		summary:
-			'Pulls Estonian electricity prices from Elering into Home Assistant, so automations can hold off until the cheap hours.',
+			'Estonian electricity prices swing hour to hour, but Home Assistant could not see them. This pulls Elering’s hourly rates into a sensor, so an automation can hold the dishwasher until the cheap window.',
 		exposes: ['Python', 'Home Assistant', 'Elering API']
 	},
 	{
 		repo: 'esc2pipe',
 		period: '2023—2024',
 		summary:
-			'Some keyboard layouts have no pipe key. These plugins put one on the Escape key instead, for Bash, Zsh, and Fish alike.',
+			'Some keyboard layouts have no pipe key at all, which makes shell work miserable. These plugins bind one to Escape for Bash, Zsh and Fish alike, so the same muscle memory works whichever shell you land in.',
 		exposes: ['Bash', 'Zsh', 'Fish']
 	}
 ];
