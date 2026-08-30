@@ -32,7 +32,6 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	const repos = (await response.json()) as GitHubRepo[];
 
 	return {
-		projects: mergeProjects(projects, repos),
-		builtAt: new Date().toISOString()
+		projects: mergeProjects(projects, repos)
 	};
 };

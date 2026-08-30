@@ -5,18 +5,13 @@
 	import { reveal } from '$lib/actions/reveal';
 	import { profile } from '$lib/data/profile';
 	import { contributions } from '$lib/data/contributions';
-	import { work, education, toolkit, languages } from '$lib/data/qualifications';
+	import { work, education, toolkit, languages, aiTools } from '$lib/data/qualifications';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	const built = $derived(
-		new Date(data.builtAt).toLocaleDateString('en-GB', {
-			day: 'numeric',
-			month: 'long',
-			year: 'numeric'
-		})
-	);
+	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
+	const letters = profile.name.split('').map((letter) => (letter === ' ' ? '\u00A0' : letter));
 
 	const sections = [
 		{ id: 'work', label: 'Work' },
@@ -52,7 +47,14 @@
 			<p class="badge mono"><span class="dot" aria-hidden="true"></span> Open to work</p>
 		{/if}
 
-		<h1 class="name">{profile.name}</h1>
+		<h1 class="name">
+			<span class="sr-only">{profile.name}</span>
+			<span aria-hidden="true">
+				{#each letters as letter, index (index)}
+					<span class="letter" style="--i: {index}">{letter}</span>
+				{/each}
+			</span>
+		</h1>
 
 		<p class="role">
 			{profile.role} at <a href={profile.employerUrl} rel="noopener">{profile.employer}</a>, based
@@ -139,6 +141,15 @@
 			{/each}
 
 			<div class="tool-group" use:reveal>
+				<h3 class="tool-heading">AI tools</h3>
+				<ul class="chips">
+					{#each aiTools as tool (tool)}
+						<li>{tool}</li>
+					{/each}
+				</ul>
+			</div>
+
+			<div class="tool-group" use:reveal>
 				<h3 class="tool-heading">Spoken languages</h3>
 				<ul class="spoken">
 					{#each languages as language (language.name)}
@@ -150,12 +161,6 @@
 	</section>
 
 	<footer class="shell colophon">
-		<p>
-			SvelteKit, prerendered to static files and deployed to GitHub Pages by Actions. Facts are
-			taken from my
-			<a href={profile.github} rel="noopener">GitHub profile</a>; the project data is fetched from
-			the GitHub API at build time. Last built {built}.
-		</p>
 		<p class="colophon-links">
 			<a href={profile.github} rel="noopener">github.com/{profile.handle}</a>
 			<a href={profile.linkedin} rel="noopener">LinkedIn</a>
@@ -172,6 +177,28 @@
 		background: color-mix(in srgb, var(--paper) 90%, transparent);
 		backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--rule);
+	}
+
+	/* Reading progress, driven entirely by CSS scroll-linked animation. Where
+	   scroll() timelines aren't supported the bar simply stays at scaleX(0). */
+	.topbar::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		bottom: -1px;
+		width: 100%;
+		height: 2px;
+		background: var(--accent);
+		transform: scaleX(0);
+		transform-origin: 0 50%;
+		animation: read linear both;
+		animation-timeline: scroll(root block);
+	}
+
+	@keyframes read {
+		to {
+			transform: scaleX(1);
+		}
 	}
 
 	.bar {
@@ -206,7 +233,39 @@
 	}
 
 	.hero {
+		position: relative;
+		isolation: isolate;
 		padding-block: clamp(3rem, 9vh, 5.5rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	/* Ambient wash behind the hero. Kept faint so the type keeps its measured
+	   contrast; it drifts rather than pulses so it never pulls the eye. */
+	.hero::before {
+		content: '';
+		position: absolute;
+		inset: -30% -15% -10%;
+		z-index: -1;
+		pointer-events: none;
+		background:
+			radial-gradient(
+				34rem 20rem at 14% 22%,
+				color-mix(in oklab, var(--accent) 20%, transparent),
+				transparent 70%
+			),
+			radial-gradient(
+				28rem 18rem at 84% 6%,
+				color-mix(in oklab, var(--accent) 12%, transparent),
+				transparent 70%
+			);
+		opacity: 0.45;
+		filter: blur(6px);
+		animation: drift 24s ease-in-out infinite alternate;
+	}
+
+	@keyframes drift {
+		to {
+			transform: translate3d(2.5%, 1.5%, 0) scale(1.07);
+		}
 	}
 
 	.badge {
@@ -232,6 +291,20 @@
 		font-weight: 700;
 		letter-spacing: -0.035em;
 		max-width: 16ch;
+	}
+
+	.letter {
+		display: inline-block;
+		animation: rise 0.75s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+		animation-delay: calc(var(--i) * 26ms);
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.42em);
+			filter: blur(8px);
+		}
 	}
 
 	.role {
@@ -370,6 +443,16 @@
 		border-radius: 6px;
 		padding: 0.2rem 0.65rem;
 		font-size: var(--step--1);
+		transition:
+			border-color 0.18s ease,
+			color 0.18s ease,
+			transform 0.18s ease;
+	}
+
+	.chips li:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+		transform: translateY(-2px);
 	}
 
 	.spoken {
@@ -401,6 +484,24 @@
 	@media (min-width: 48rem) {
 		.nav {
 			display: flex;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.letter {
+			animation: none;
+		}
+
+		.hero::before {
+			animation: none;
+		}
+
+		.topbar::after {
+			display: none;
+		}
+
+		.chips li:hover {
+			transform: none;
 		}
 	}
 

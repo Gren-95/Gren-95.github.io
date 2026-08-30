@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Project } from '$lib/types/project';
 	import { reveal } from '$lib/actions/reveal';
+	import { spotlight } from '$lib/actions/spotlight';
 
 	let { project, index }: { project: Project; index: number } = $props();
 
@@ -9,7 +10,7 @@
 	);
 </script>
 
-<article class="card" use:reveal={Math.min(index, 3) * 60}>
+<article class="card" use:reveal={Math.min(index, 3) * 60} use:spotlight>
 	<header class="head">
 		<h3 class="name">
 			<a href={project.url} rel="noopener">{project.repo}</a>
@@ -34,6 +35,8 @@
 
 <style>
 	.card {
+		position: relative;
+		isolation: isolate;
 		display: flex;
 		flex-direction: column;
 		gap: 0.85rem;
@@ -46,9 +49,56 @@
 			transform 0.15s ease;
 	}
 
+	/* A highlight that tracks the cursor across the card. --px/--py are written
+	   by the spotlight action; they start off-card so nothing shows until the
+	   pointer actually arrives. */
+	.card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		border-radius: inherit;
+		background: radial-gradient(
+			13rem circle at var(--px, -100%) var(--py, -100%),
+			color-mix(in oklab, var(--accent) 26%, transparent),
+			transparent 66%
+		);
+		opacity: 0;
+		transition: opacity 0.35s ease;
+		pointer-events: none;
+	}
+
+	.card > * {
+		position: relative;
+		z-index: 1;
+	}
+
 	.card:hover {
 		border-color: var(--accent);
-		transform: translateY(-2px);
+		transform: translateY(-3px);
+	}
+
+	.card:hover::before {
+		opacity: 1;
+	}
+
+	.card:hover .name {
+		color: var(--accent);
+	}
+
+	.name {
+		transition: color 0.2s ease;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.card,
+		.card::before {
+			transition: none;
+		}
+
+		.card:hover {
+			transform: none;
+		}
 	}
 
 	.head {
