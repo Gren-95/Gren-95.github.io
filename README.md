@@ -115,3 +115,18 @@ text still reads at 6.5:1 against AA's 4.5:1 floor.
 `.github/workflows/deploy.yml` runs on every push to `main`: install, format
 check, tests, build, then publish `build/` to GitHub Pages. Pull requests run
 everything except the deploy.
+
+## Licence
+
+The code is MIT — see [LICENSE](LICENSE). The written content and personal
+details (biography, work history, schooling) are not offered for reuse; if you
+want the site as a starting point, take the code and bring your own facts.
+
+Brand marks in the toolkit section belong to their respective owners and are
+included via [Simple Icons](https://simpleicons.org/) for identification only.
+
+## Repository conventions
+
+- `main` is protected: changes land through a pull request, squash-merged,
+  with the `build` check passing. Merged branches delete themselves.
+- Branches are named `{issue-number}-{short-description}`.
