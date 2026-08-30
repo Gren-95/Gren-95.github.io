@@ -1,0 +1,171 @@
+/* ---------------------------------------------------------------------------
+   Palette: limestone and verdigris.
+   Estonian limestone (paekivi) for the ground, oxidised copper for the single
+   accent. The accent is reserved exclusively for "exposes" values, so the eye
+   follows one green thread of capabilities down the whole catalogue.
+--------------------------------------------------------------------------- */
+:root {
+	--paper: #e6e5df;
+	--paper-raised: #f2f1ec;
+	--ink: #14171a;
+	--ink-muted: #5e6368;
+	--rule: #cfcdc4;
+	--accent: #2c6a5d;
+	--selection: #cfe0da;
+
+	--display: 'Fraunces', Georgia, 'Times New Roman', serif;
+	--body: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--utility: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+	/* fluid type scale, 1.25 ratio at both ends */
+	--step--1: clamp(0.76rem, 0.74rem + 0.1vw, 0.82rem);
+	--step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1.06rem);
+	--step-1: clamp(1.15rem, 1.05rem + 0.5vw, 1.5rem);
+	--step-2: clamp(1.6rem, 1.3rem + 1.5vw, 2.6rem);
+	--step-3: clamp(2.4rem, 1.6rem + 3.8vw, 5.2rem);
+
+	--measure: 34ch;
+	--gutter: clamp(1.25rem, 5vw, 4rem);
+	--rail: 5.5rem;
+
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	--paper: #15181b;
+	--paper-raised: #1d2126;
+	--ink: #e6e4dd;
+	--ink-muted: #909699;
+	--rule: #2e3339;
+	--accent: #6fb6a3;
+	--selection: #22403a;
+
+	color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: var(--body);
+	font-size: var(--step-0);
+	line-height: 1.6;
+	font-synthesis-weight: none;
+	-webkit-font-smoothing: antialiased;
+	transition:
+		background-color 0.4s ease,
+		color 0.4s ease;
+}
+
+::selection {
+	background: var(--selection);
+	color: var(--ink);
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--display);
+	font-variation-settings:
+		'SOFT' 0,
+		'WONK' 1,
+		'opsz' 144;
+	font-weight: 400;
+	letter-spacing: -0.022em;
+	line-height: 0.98;
+	margin: 0;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+a {
+	color: inherit;
+	text-decoration-color: var(--rule);
+	text-underline-offset: 0.22em;
+	text-decoration-thickness: 1px;
+	transition:
+		text-decoration-color 0.2s ease,
+		color 0.2s ease;
+}
+
+a:hover {
+	text-decoration-color: currentColor;
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+	border-radius: 1px;
+}
+
+.mono {
+	font-family: var(--utility);
+	font-size: var(--step--1);
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	font-feature-settings: 'ss01';
+}
+
+/* The eyebrow marks a section without decorating it: it names the section and
+   states how many entries it holds. */
+.eyebrow {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+	padding-bottom: 0.9rem;
+	border-bottom: 1px solid var(--ink);
+	color: var(--ink-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+}
+
+.eyebrow > span:first-child {
+	color: var(--ink);
+}
+
+.shell {
+	max-width: 74rem;
+	margin: 0 auto;
+	padding-inline: var(--gutter);
+}
+
+.skip-link {
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	background: var(--ink);
+	color: var(--paper);
+	padding: 0.6rem 1rem;
+	z-index: 10;
+}
+
+.skip-link:focus {
+	left: 0.5rem;
+	top: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

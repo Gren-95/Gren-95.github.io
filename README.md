@@ -1,0 +1,92 @@
+# gren-95.github.io
+
+Personal portfolio for Efe Marko Güldere (`Gren95`), Rakvere, Estonia.
+Live at **https://gren-95.github.io/**.
+
+A SvelteKit site prerendered to static files and served by GitHub Pages. There
+is no server: the catalogue's languages, star counts, and last-push dates are
+fetched from the GitHub API while the site builds, so the page is as fresh as
+the last deploy.
+
+## Getting started
+
+### Prerequisites
+
+- Node.js >= 22
+- pnpm >= 10
+
+### Installation
+
+```bash
+pnpm install
+```
+
+### Running locally
+
+```bash
+pnpm run dev
+```
+
+The build calls `https://api.github.com/users/Gren-95/repos` once. Unauthenticated
+requests are capped at 60 an hour, which is ample locally; CI passes a token.
+
+## Available scripts
+
+```bash
+pnpm run dev      # start the dev server
+pnpm run build    # prerender the site into build/
+pnpm run preview  # serve the production build
+pnpm run test     # run unit tests once
+pnpm run lint     # check formatting
+pnpm run format   # rewrite formatting
+pnpm run check    # svelte-check against tsconfig
+```
+
+## Project structure
+
+```
+src/
+├── app.css                    design tokens and base styles
+├── app.html                   document shell, fonts, pre-paint theme
+├── lib/
+│   ├── actions/reveal.ts      scroll-in reveal, skipped under reduced motion
+│   ├── components/            ProjectEntry, ThemeToggle
+│   ├── data/                  curated content: projects, contributions,
+│   │                          qualifications, profile
+│   ├── mergeProjects.ts       joins curated entries to live GitHub facts
+│   └── types/                 shared interfaces
+├── routes/
+│   ├── +layout.ts             prerender the whole site
+│   ├── +page.server.ts        build-time GitHub fetch
+│   └── +page.svelte           the page
+static/                        favicon, robots.txt, .nojekyll
+```
+
+## Editing the content
+
+Everything worth changing lives in `src/lib/data/`:
+
+| File                | Holds                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| `profile.ts`        | name, location, the opening sentence, contact details       |
+| `projects.ts`       | the curated catalogue — repo name, period, summary, exposes |
+| `contributions.ts`  | work sent to projects other people maintain                 |
+| `qualifications.ts` | skill groups, schooling, spoken languages                   |
+
+Adding a project means adding an entry to `projects.ts` whose `repo` matches a
+public repository name. If it doesn't match, the build fails on purpose rather
+than quietly dropping the entry.
+
+## Design
+
+Ground is Estonian limestone, the single accent is oxidised copper, and the
+accent is reserved for `exposes` values so capabilities read as one thread down
+the catalogue. Type is Fraunces (display, with the WONK axis on), Archivo
+(body), and Spline Sans Mono (data). Light and dark both ship; the choice is
+stored per browser and settled before first paint.
+
+## Deployment
+
+`.github/workflows/deploy.yml` runs on every push to `main`: install, format
+check, tests, build, then publish `build/` to GitHub Pages. Pull requests run
+everything except the deploy.
