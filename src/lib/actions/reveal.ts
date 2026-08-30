@@ -4,29 +4,41 @@
  * everything.
  */
 export function reveal(node: HTMLElement, delay = 0) {
-	const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-	if (reduced) return {};
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return {};
 
 	node.style.opacity = '0';
-	node.style.transform = 'translateY(14px)';
+	node.style.transform = 'translateY(22px)';
 	node.style.transition = `opacity .7s ease ${delay}ms, transform .7s cubic-bezier(.2,.7,.3,1) ${delay}ms`;
+	node.style.willChange = 'opacity, transform';
 
-	const observer = new IntersectionObserver(
-		(entries) => {
-			for (const entry of entries) {
-				if (!entry.isIntersecting) continue;
-				node.style.opacity = '1';
-				node.style.transform = 'none';
-				observer.unobserve(node);
-			}
-		},
-		{ rootMargin: '0px 0px -8% 0px' }
+	let observer: IntersectionObserver | undefined;
+
+	function show(entries: IntersectionObserverEntry[]) {
+		for (const entry of entries) {
+			if (!entry.isIntersecting) continue;
+			node.style.opacity = '1';
+			node.style.transform = 'none';
+			node.addEventListener('transitionend', () => (node.style.willChange = 'auto'), {
+				once: true
+			});
+			observer?.unobserve(node);
+		}
+	}
+
+	// Two frames, so the hidden state is painted before the observer can fire.
+	// Without this, anything already inside the viewport on load has its start
+	// and end styles applied in the same frame and snaps in with no transition.
+	const queued = requestAnimationFrame(() =>
+		requestAnimationFrame(() => {
+			observer = new IntersectionObserver(show, { rootMargin: '0px 0px -6% 0px' });
+			observer.observe(node);
+		})
 	);
 
-	observer.observe(node);
-
 	return {
-		destroy: () => observer.disconnect()
+		destroy() {
+			cancelAnimationFrame(queued);
+			observer?.disconnect();
+		}
 	};
 }

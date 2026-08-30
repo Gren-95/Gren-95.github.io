@@ -1,6 +1,8 @@
 import { env } from '$env/dynamic/private';
 import { mergeProjects, type GitHubRepo } from '$lib/mergeProjects';
 import { projects } from '$lib/data/projects';
+import { toolkit, aiTools } from '$lib/data/qualifications';
+import { resolveTool, resolveToolkit } from '$lib/resolveToolIcons';
 import type { PageServerLoad } from './$types';
 
 const API = 'https://api.github.com/users/Gren-95/repos?per_page=100&type=owner';
@@ -32,6 +34,10 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	const repos = (await response.json()) as GitHubRepo[];
 
 	return {
-		projects: mergeProjects(projects, repos)
+		projects: mergeProjects(projects, repos),
+		// Logos and brand colours are resolved here so Simple Icons stays a
+		// build-time dependency; only the resolved path strings reach the browser.
+		toolkit: resolveToolkit(toolkit),
+		aiTools: aiTools.map(resolveTool)
 	};
 };
