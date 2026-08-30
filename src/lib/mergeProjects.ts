@@ -8,6 +8,7 @@ export interface GitHubRepo {
 	pushed_at: string;
 	html_url: string;
 	description: string | null;
+	homepage: string | null;
 }
 
 /**
@@ -36,7 +37,9 @@ export function mergeProjects(curated: CuratedProject[], repos: GitHubRepo[]): P
 			stars: repo.stargazers_count,
 			pushedAt: repo.pushed_at,
 			url: repo.html_url,
-			description: repo.description
+			description: repo.description,
+			// GitHub returns '' rather than null for an unset homepage.
+			homepage: repo.homepage ? repo.homepage : null
 		};
 	});
 }
