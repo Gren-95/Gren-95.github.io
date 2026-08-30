@@ -1,44 +1,44 @@
 /* ---------------------------------------------------------------------------
-   Palette: limestone and verdigris.
-   Estonian limestone (paekivi) for the ground, oxidised copper for the single
-   accent. The accent is reserved exclusively for "exposes" values, so the eye
-   follows one green thread of capabilities down the whole catalogue.
+   Palette: Tailwind Stone with his own cyan.
+   Stone is the palette he picked for hyprland-dots; #33ccff is the accent from
+   his GitHub profile banner. On the light ground the cyan is darkened to
+   cyan-700 so it clears AA — measured ratios are noted against each token.
 --------------------------------------------------------------------------- */
 :root {
-	--paper: #e6e5df;
-	--paper-raised: #f2f1ec;
-	--ink: #14171a;
-	--ink-muted: #5e6368;
-	--rule: #cfcdc4;
-	--accent: #2c6a5d;
-	--selection: #cfe0da;
+	--paper: #fafaf9;
+	--raised: #ffffff;
+	--ink: #1c1917; /* 16.74:1 */
+	--muted: #57534e; /*  7.30:1 */
+	--accent: #0e7490; /*  5.13:1 */
+	--accent-wash: #ecfeff;
+	--rule: #e7e5e4;
+	--rule-strong: #d6d3d1;
 
-	--display: 'Fraunces', Georgia, 'Times New Roman', serif;
+	--display: 'Bricolage Grotesque', 'Archivo', system-ui, sans-serif;
 	--body: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-	--utility: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+	--mono: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-	/* fluid type scale, 1.25 ratio at both ends */
-	--step--1: clamp(0.76rem, 0.74rem + 0.1vw, 0.82rem);
-	--step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1.06rem);
-	--step-1: clamp(1.15rem, 1.05rem + 0.5vw, 1.5rem);
-	--step-2: clamp(1.6rem, 1.3rem + 1.5vw, 2.6rem);
-	--step-3: clamp(2.4rem, 1.6rem + 3.8vw, 5.2rem);
+	/* Body starts at 17px, not 15px. Nothing on the page is smaller than 14px. */
+	--step--1: clamp(0.875rem, 0.86rem + 0.08vw, 0.9375rem);
+	--step-0: clamp(1.0625rem, 1.03rem + 0.16vw, 1.15rem);
+	--step-1: clamp(1.25rem, 1.17rem + 0.35vw, 1.5rem);
+	--step-2: clamp(1.6rem, 1.42rem + 0.8vw, 2.15rem);
+	--step-3: clamp(2.3rem, 1.75rem + 2.4vw, 4rem);
 
-	--measure: 34ch;
-	--gutter: clamp(1.25rem, 5vw, 4rem);
-	--rail: 5.5rem;
+	--gutter: clamp(1.25rem, 5vw, 3.5rem);
 
 	color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-	--paper: #15181b;
-	--paper-raised: #1d2126;
-	--ink: #e6e4dd;
-	--ink-muted: #909699;
-	--rule: #2e3339;
-	--accent: #6fb6a3;
-	--selection: #22403a;
+	--paper: #1c1917;
+	--raised: #292524;
+	--ink: #f5f5f4; /* 16.03:1 */
+	--muted: #a8a29e; /*  6.93:1 */
+	--accent: #33ccff; /*  9.35:1 */
+	--accent-wash: #14343f;
+	--rule: #34302d;
+	--rule-strong: #44403c;
 
 	color-scheme: dark;
 }
@@ -51,6 +51,7 @@
 
 html {
 	-webkit-text-size-adjust: 100%;
+	scroll-behavior: smooth;
 }
 
 body {
@@ -59,30 +60,25 @@ body {
 	color: var(--ink);
 	font-family: var(--body);
 	font-size: var(--step-0);
-	line-height: 1.6;
-	font-synthesis-weight: none;
+	line-height: 1.65;
 	-webkit-font-smoothing: antialiased;
 	transition:
-		background-color 0.4s ease,
-		color 0.4s ease;
+		background-color 0.3s ease,
+		color 0.3s ease;
 }
 
 ::selection {
-	background: var(--selection);
-	color: var(--ink);
+	background: var(--accent);
+	color: var(--paper);
 }
 
 h1,
 h2,
 h3 {
 	font-family: var(--display);
-	font-variation-settings:
-		'SOFT' 0,
-		'WONK' 1,
-		'opsz' 144;
-	font-weight: 400;
-	letter-spacing: -0.022em;
-	line-height: 0.98;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	line-height: 1.1;
 	margin: 0;
 	text-wrap: balance;
 }
@@ -94,52 +90,33 @@ p {
 
 a {
 	color: inherit;
-	text-decoration-color: var(--rule);
-	text-underline-offset: 0.22em;
 	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+	text-decoration-color: var(--rule-strong);
 	transition:
-		text-decoration-color 0.2s ease,
-		color 0.2s ease;
+		color 0.15s ease,
+		text-decoration-color 0.15s ease;
 }
 
 a:hover {
+	color: var(--accent);
 	text-decoration-color: currentColor;
 }
 
 :focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: 3px;
-	border-radius: 1px;
+	border-radius: 3px;
 }
 
 .mono {
-	font-family: var(--utility);
+	font-family: var(--mono);
 	font-size: var(--step--1);
-	font-weight: 400;
-	letter-spacing: 0.02em;
-	font-feature-settings: 'ss01';
-}
-
-/* The eyebrow marks a section without decorating it: it names the section and
-   states how many entries it holds. */
-.eyebrow {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 1rem;
-	padding-bottom: 0.9rem;
-	border-bottom: 1px solid var(--ink);
-	color: var(--ink-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.16em;
-}
-
-.eyebrow > span:first-child {
-	color: var(--ink);
+	letter-spacing: 0;
 }
 
 .shell {
-	max-width: 74rem;
+	max-width: 68rem;
 	margin: 0 auto;
 	padding-inline: var(--gutter);
 }
@@ -147,11 +124,10 @@ a:hover {
 .skip-link {
 	position: absolute;
 	left: -9999px;
-	top: 0;
 	background: var(--ink);
 	color: var(--paper);
-	padding: 0.6rem 1rem;
-	z-index: 10;
+	padding: 0.7rem 1.1rem;
+	z-index: 20;
 }
 
 .skip-link:focus {
@@ -160,12 +136,14 @@ a:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
 	*,
 	*::before,
 	*::after {
 		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
-		scroll-behavior: auto !important;
 	}
 }
