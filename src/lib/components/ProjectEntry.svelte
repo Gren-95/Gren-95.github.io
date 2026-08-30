@@ -27,6 +27,11 @@
 	</ul>
 
 	<footer class="meta mono">
+		{#if project.homepage}
+			<a class="live" href={project.homepage} rel="noopener">
+				<span class="pulse" aria-hidden="true"></span>Live
+			</a>
+		{/if}
 		{#if project.language}<span>{project.language}</span>{/if}
 		{#if project.stars > 0}<span>{project.stars} ★</span>{/if}
 		<span>Updated {updated}</span>
@@ -86,11 +91,43 @@
 		color: var(--accent);
 	}
 
+	.live {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		color: var(--accent);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.live:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+
+	.pulse {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: currentColor;
+		animation: beat 2s ease-in-out infinite;
+	}
+
+	@keyframes beat {
+		50% {
+			opacity: 0.25;
+		}
+	}
+
 	.name {
 		transition: color 0.2s ease;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.pulse {
+			animation: none;
+		}
+
 		.card,
 		.card::before {
 			transition: none;

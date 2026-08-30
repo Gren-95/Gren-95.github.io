@@ -17,6 +17,8 @@ export interface RepoFacts {
 	pushedAt: string;
 	url: string;
 	description: string | null;
+	/** A running instance, when the repository sets one. */
+	homepage: string | null;
 }
 
 /** A curated entry merged with its live facts, ready to render. */

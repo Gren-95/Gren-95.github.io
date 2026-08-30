@@ -10,6 +10,7 @@ function repo(overrides: Partial<GitHubRepo> & { name: string }): GitHubRepo {
 		pushed_at: '2026-01-01T00:00:00Z',
 		html_url: `https://github.com/Gren-95/${overrides.name}`,
 		description: null,
+		homepage: null,
 		...overrides
 	};
 }
@@ -35,6 +36,16 @@ describe('mergeProjects', () => {
 
 	it('throws when a curated entry has no matching repository', () => {
 		expect(() => mergeProjects(curated, [repo({ name: 'finch' })])).toThrow(/"wren" was not found/);
+	});
+
+	it('treats an unset homepage as absent rather than an empty link', () => {
+		const [blank] = mergeProjects(curated, [repo({ name: 'wren', homepage: '' })]);
+		const [live] = mergeProjects(curated, [
+			repo({ name: 'wren', homepage: 'https://example.com' })
+		]);
+
+		expect(blank.homepage).toBeNull();
+		expect(live.homepage).toBe('https://example.com');
 	});
 
 	it('preserves curated order rather than GitHub order', () => {

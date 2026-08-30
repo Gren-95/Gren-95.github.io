@@ -93,8 +93,8 @@
 		<div class="section-head">
 			<h2>Projects</h2>
 			<p class="section-note">
-				The six on my GitHub profile. Language, stars and dates come from the GitHub API when the
-				site builds.
+				Six things I have built, newest first. Language, stars, dates and live links come from the
+				GitHub API when the site builds.
 			</p>
 		</div>
 		<div class="grid">

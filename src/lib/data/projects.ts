@@ -1,7 +1,7 @@
 import type { CuratedProject } from '$lib/types/project';
 
 /**
- * The six projects listed on the GitHub profile README, newest activity first.
+ * Six projects, newest activity first README, newest activity first.
  * Live language, stars and last-push data are merged in at build time by
  * src/routes/+page.server.ts.
  */
@@ -28,18 +28,18 @@ export const projects: CuratedProject[] = [
 		exposes: ['Go', 'single binary', 'self-hosted']
 	},
 	{
+		repo: 'spawnpoint',
+		period: '2026',
+		summary:
+			'Start, stop, and back up Minecraft servers from a browser, instead of opening an SSH session every time a friend wants a world spun up.',
+		exposes: ['TypeScript', 'self-hosted', 'backups', 'console']
+	},
+	{
 		repo: 'ha-elering-ee',
 		period: '2026',
 		summary:
 			'Pulls Estonian electricity prices from Elering into Home Assistant, so automations can hold off until the cheap hours.',
 		exposes: ['Python', 'Home Assistant', 'Elering API']
-	},
-	{
-		repo: 'java-gui-calculator',
-		period: '2025',
-		summary:
-			'A desktop calculator in Java with several calculation modes, written to learn the language’s UI toolkit properly rather than in outline.',
-		exposes: ['Java', 'desktop UI']
 	},
 	{
 		repo: 'esc2pipe',
