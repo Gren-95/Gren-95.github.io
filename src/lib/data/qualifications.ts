@@ -1,74 +1,111 @@
-/**
- * Drawn from the 2023 portfolio at github.com/Gren-95/MyPortfolio, translated
- * from Estonian and regrouped. The original rated each skill as a percentage;
- * those numbers were self-assessed and are left out on purpose.
- */
+/** Work, schooling, toolkit and spoken languages, from the GitHub profile README. */
 
-export interface SkillGroup {
-	heading: string;
-	note: string;
-	skills: string[];
-}
-
-export const skillGroups: SkillGroup[] = [
-	{
-		heading: 'Networks and hardware',
-		note: 'Built and cabled from bare parts, not just configured.',
-		skills: [
-			'RJ45 termination, CAT 5e through CAT 7',
-			'Punchdown to 110 blocks and keystone panels',
-			'Cisco switches and routers',
-			'Cisco Packet Tracer',
-			'Wireless access points',
-			'IP cameras',
-			'Desktop assembly and laptop teardown',
-			'Fault diagnosis'
-		]
-	},
-	{
-		heading: 'Systems and servers',
-		note: 'Linux first, the other two when the job needs them.',
-		skills: [
-			'Linux, Windows, macOS',
-			'Shell scripting in Bash, Zsh, and Fish',
-			'PowerShell',
-			'Hyper-V, virt-manager, VirtualBox',
-			'Docker and Podman',
-			'Self-hosted services behind a reverse proxy',
-			'Home Assistant and Zigbee2MQTT'
-		]
-	},
-	{
-		heading: 'Languages I write',
-		note: 'Ordered by how much of it I have actually shipped.',
-		skills: ['Rust', 'TypeScript', 'JavaScript', 'Python', 'Go', 'QML', 'Shell', 'PHP']
-	}
-];
-
-export interface TimelineEntry {
+export interface Post {
 	period: string;
 	title: string;
 	place: string;
+	placeUrl?: string;
 	detail: string;
 }
 
-export const education: TimelineEntry[] = [
+export const work: Post[] = [
 	{
-		period: '2021—',
-		title: 'Vocational secondary education',
-		place: 'Rakvere Ametikool',
-		detail:
-			'Computer networks and hardware. Coursework ran to a working server rack: two Cisco switches, a router, a 110 block, and a keystone panel, cabled and labelled to be used rather than graded.'
+		period: 'Feb 2024 — present',
+		title: 'Junior Web Developer',
+		place: 'JELD-WEN Eesti AS',
+		placeUrl: 'https://www.jeld-wen.com/',
+		detail: 'Building web applications and keeping the IT infrastructure behind them running.'
 	},
 	{
-		period: '2012—2021',
-		title: 'Basic education',
-		place: 'Rakvere Põhikool',
-		detail: 'Rakvere, Estonia.'
+		period: '2022 — Feb 2024',
+		title: 'IT Support Technician',
+		place: 'JELD-WEN Eesti AS',
+		placeUrl: 'https://www.jeld-wen.com/',
+		detail: 'Three internships at the same company, which turned into the developer post above.'
+	}
+];
+
+export const education: Post[] = [
+	{
+		period: '2024 — 2026',
+		title: 'Junior Developer, EQF level 4',
+		place: 'Viljandi Kutsehariduskeskus',
+		placeUrl: 'https://vikk.ee/',
+		detail: 'Vocational qualification in software development.'
+	},
+	{
+		period: '2021 — 2024',
+		title: 'Junior IT Systems Specialist, EQF level 4',
+		place: 'Rakvere Ametikool',
+		placeUrl: 'https://rak.ee/',
+		detail:
+			'Networks and hardware, down to terminating the cable: coursework ran to a working rack of Cisco switches, a router, a 110 block and a keystone panel.'
+	}
+];
+
+export interface ToolGroup {
+	heading: string;
+	tools: string[];
+}
+
+/**
+ * Condensed from the profile README's badge wall. Grouped so it can be read
+ * rather than scanned past.
+ */
+export const toolkit: ToolGroup[] = [
+	{
+		heading: 'Languages',
+		tools: ['Go', 'Python', 'TypeScript', 'JavaScript', 'PHP', 'Java', 'Shell', 'PowerShell']
+	},
+	{
+		heading: 'Web and runtime',
+		tools: [
+			'React',
+			'Node.js',
+			'Express',
+			'Bun',
+			'Vite',
+			'Tailwind CSS',
+			'jQuery',
+			'Playwright',
+			'Nginx',
+			'Apache'
+		]
+	},
+	{
+		heading: 'Data',
+		tools: ['MySQL', 'MariaDB', 'SQLite', 'Prisma', 'phpMyAdmin']
+	},
+	{
+		heading: 'Systems and networking',
+		tools: [
+			'Linux',
+			'Windows',
+			'macOS',
+			'Active Directory',
+			'WireGuard',
+			'Tailscale',
+			'Cisco networking'
+		]
+	},
+	{
+		heading: 'Infrastructure and automation',
+		tools: [
+			'Docker',
+			'Proxmox',
+			'Portainer',
+			'Ansible',
+			'Terraform',
+			'GitHub Actions',
+			'TrueNAS',
+			'DigitalOcean',
+			'Home Assistant',
+			'ServiceNow'
+		]
 	}
 ];
 
 export const languages = [
 	{ name: 'Estonian', level: 'Native' },
-	{ name: 'English', level: 'Fluent — I think in both, in parallel' }
+	{ name: 'English', level: 'Professional working proficiency' }
 ];

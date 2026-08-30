@@ -4,9 +4,14 @@ Personal portfolio for Efe Marko Güldere (`Gren95`), Rakvere, Estonia.
 Live at **https://gren-95.github.io/**.
 
 A SvelteKit site prerendered to static files and served by GitHub Pages. There
-is no server: the catalogue's languages, star counts, and last-push dates are
+is no server: the project languages, star counts, and last-push dates are
 fetched from the GitHub API while the site builds, so the page is as fresh as
 the last deploy.
+
+Facts — role, employer, schooling, toolkit, project selection — are taken from
+the GitHub profile README at [github.com/Gren-95](https://github.com/Gren-95),
+which is the single source of truth. Change them there first, then mirror them
+into `src/lib/data/`.
 
 ## Getting started
 
@@ -79,11 +84,14 @@ than quietly dropping the entry.
 
 ## Design
 
-Ground is Estonian limestone, the single accent is oxidised copper, and the
-accent is reserved for `exposes` values so capabilities read as one thread down
-the catalogue. Type is Fraunces (display, with the WONK axis on), Archivo
-(body), and Spline Sans Mono (data). Light and dark both ship; the choice is
-stored per browser and settled before first paint.
+Tailwind Stone for the ground — the palette used in `hyprland-dots` — with the
+`#33ccff` cyan from the GitHub profile banner as the accent, darkened to
+cyan-700 on the light theme so it clears WCAG AA. Measured against their
+grounds: body text 16.7:1, muted text 7.3:1, accent 5.1:1.
+
+Type is Bricolage Grotesque (display), Archivo (body), and Spline Sans Mono
+(dates and tags). Nothing on the page is set below 14px. Light and dark both
+ship; the choice is stored per browser and settled before first paint.
 
 ## Deployment
 

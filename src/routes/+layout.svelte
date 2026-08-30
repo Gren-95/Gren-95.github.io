@@ -4,6 +4,6 @@
 	let { children } = $props();
 </script>
 
-<a class="skip-link" href="#catalogue">Skip to the work</a>
+<a class="skip-link" href="#work">Skip to the content</a>
 
 {@render children()}

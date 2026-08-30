@@ -1,10 +1,11 @@
 <script lang="ts">
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
+	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { reveal } from '$lib/actions/reveal';
 	import { profile } from '$lib/data/profile';
 	import { contributions } from '$lib/data/contributions';
-	import { skillGroups, education, languages } from '$lib/data/qualifications';
+	import { work, education, toolkit, languages } from '$lib/data/qualifications';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -16,148 +17,148 @@
 			year: 'numeric'
 		})
 	);
+
+	const sections = [
+		{ id: 'work', label: 'Work' },
+		{ id: 'education', label: 'Education' },
+		{ id: 'projects', label: 'Projects' },
+		{ id: 'toolkit', label: 'Toolkit' }
+	];
 </script>
 
 <svelte:head>
-	<title>{profile.name} — desktop software and self-hosted services</title>
-	<meta
-		name="description"
-		content="{profile.thesis} Work, capabilities and schooling of {profile.name}, {profile.location}."
-	/>
-	<meta property="og:title" content="{profile.name} — {profile.handle}" />
-	<meta property="og:description" content={profile.thesis} />
+	<title>{profile.name} — {profile.role}, {profile.location}</title>
+	<meta name="description" content="{profile.role} at {profile.employer}. {profile.intro}" />
+	<meta property="og:title" content="{profile.name} — {profile.role}" />
+	<meta property="og:description" content={profile.intro} />
 	<meta property="og:type" content="profile" />
 </svelte:head>
 
 <header class="topbar">
-	<div class="shell topbar-inner mono">
-		<span class="wordmark">{profile.handle}</span>
-		<nav>
-			<a href="#catalogue">Built</a>
-			<a href="#upstream">Upstream</a>
-			<a href="#capabilities">Capable of</a>
-			<a href="#schooling">Schooling</a>
+	<div class="shell bar">
+		<a class="wordmark" href="#top">{profile.handle}</a>
+		<nav class="nav">
+			{#each sections as section (section.id)}
+				<a href="#{section.id}">{section.label}</a>
+			{/each}
 		</nav>
 		<ThemeToggle />
 	</div>
 </header>
 
-<main>
-	<!-- Hero: the name at full size, one sentence of thesis, and the two facts
-	     that place him. No statistics row; the catalogue is the evidence. -->
+<main id="top">
 	<section class="shell hero">
+		{#if profile.available}
+			<p class="badge mono"><span class="dot" aria-hidden="true"></span> Open to work</p>
+		{/if}
+
 		<h1 class="name">{profile.name}</h1>
-		<p class="thesis">{profile.thesis}</p>
-		<p class="aim">{profile.aim}</p>
 
-		<dl class="standing mono">
-			<dt>currently</dt>
-			<dd>{profile.currently}</dd>
-			<dt>based in</dt>
-			<dd>{profile.location}</dd>
-			<dt>reachable</dt>
-			<dd>
-				<a href="mailto:{profile.email}">{profile.email}</a>
-				<span class="sep" aria-hidden="true">·</span>
-				<a href={profile.github} rel="noopener">github.com/{profile.handle}</a>
-			</dd>
-		</dl>
+		<p class="role">
+			{profile.role} at <a href={profile.employerUrl} rel="noopener">{profile.employer}</a>, based
+			in {profile.location}.
+		</p>
+
+		<p class="intro">{profile.intro}</p>
+
+		<div class="links">
+			<a class="link" href={profile.github} rel="noopener">GitHub</a>
+			<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
+			<a class="link" href="mailto:{profile.email}">Email</a>
+		</div>
 	</section>
 
-	<section class="shell section" id="catalogue">
-		<h2 class="eyebrow mono">
-			<span>Built</span>
-			<span>{data.projects.length} of 66 public repositories</span>
-		</h2>
-		{#each data.projects as project, index (project.repo)}
-			<ProjectEntry {project} {index} />
-		{/each}
+	<section class="shell section" id="work">
+		<div class="section-head">
+			<h2>Work</h2>
+			<p class="section-note">One employer, two roles.</p>
+		</div>
+		<PostList posts={work} />
 	</section>
 
-	<section class="shell section" id="upstream">
-		<h2 class="eyebrow mono">
-			<span>Upstream</span>
-			<span>Sent to projects other people maintain</span>
-		</h2>
-		{#each contributions as contribution, index (contribution.url)}
-			<article class="contribution" use:reveal={index * 70}>
-				<div class="rail mono">
-					<span class="state" data-state={contribution.state}>{contribution.state}</span>
-				</div>
-				<div>
-					<h3 class="contribution-title">
-						<a href={contribution.url} rel="noopener"
-							>{contribution.project}
-							<span class="ref mono">{contribution.reference}</span></a
-						>
-					</h3>
-					<p class="summary">{contribution.summary}</p>
-				</div>
-			</article>
-		{/each}
+	<section class="shell section" id="education">
+		<div class="section-head">
+			<h2>Education</h2>
+			<p class="section-note">Vocational, in Estonia.</p>
+		</div>
+		<PostList posts={education} />
 	</section>
 
-	<section class="shell section" id="capabilities">
-		<h2 class="eyebrow mono">
-			<span>Capable of</span>
-			<span>Hands on, not certificates</span>
-		</h2>
-		<div class="skills">
-			{#each skillGroups as group, index (group.heading)}
-				<div class="skill-group" use:reveal={index * 70}>
-					<h3 class="skill-heading">{group.heading}</h3>
-					<p class="skill-note">{group.note}</p>
-					<ul class="skill-list mono">
-						{#each group.skills as skill (skill)}
-							<li>{skill}</li>
-						{/each}
-					</ul>
-				</div>
+	<section class="shell section" id="projects">
+		<div class="section-head">
+			<h2>Projects</h2>
+			<p class="section-note">
+				The six on my GitHub profile. Language, stars and dates come from the GitHub API when the
+				site builds.
+			</p>
+		</div>
+		<div class="grid">
+			{#each data.projects as project, index (project.repo)}
+				<ProjectEntry {project} {index} />
 			{/each}
 		</div>
 	</section>
 
-	<section class="shell section" id="schooling">
-		<h2 class="eyebrow mono">
-			<span>Schooling</span>
-			<span>Rakvere</span>
-		</h2>
-		{#each education as entry, index (entry.title)}
-			<article class="entry" use:reveal={index * 70}>
-				<div class="rail mono"><span class="period">{entry.period}</span></div>
-				<div>
-					<h3 class="school-title">{entry.title}</h3>
-					<p class="school-place mono">{entry.place}</p>
-					<p class="summary">{entry.detail}</p>
-				</div>
-			</article>
-		{/each}
+	<section class="shell section" id="upstream">
+		<div class="section-head">
+			<h2>Upstream</h2>
+			<p class="section-note">Work sent to projects other people maintain.</p>
+		</div>
+		<ol class="contributions">
+			{#each contributions as contribution, index (contribution.url)}
+				<li class="contribution" use:reveal={index * 60}>
+					<span class="state mono" data-state={contribution.state}>{contribution.state}</span>
+					<div>
+						<h3 class="contribution-title">
+							<a href={contribution.url} rel="noopener">
+								{contribution.project} <span class="ref mono">{contribution.reference}</span>
+							</a>
+						</h3>
+						<p class="detail">{contribution.summary}</p>
+					</div>
+				</li>
+			{/each}
+		</ol>
+	</section>
 
-		<div class="entry" use:reveal>
-			<div class="rail mono"><span class="period">Languages</span></div>
-			<dl class="standing mono no-rule">
-				{#each languages as language (language.name)}
-					<dt>{language.name.toLowerCase()}</dt>
-					<dd>{language.level}</dd>
-				{/each}
-			</dl>
+	<section class="shell section" id="toolkit">
+		<div class="section-head">
+			<h2>Toolkit</h2>
+			<p class="section-note">What I have actually put into production or into a homelab.</p>
+		</div>
+		<div class="tools">
+			{#each toolkit as group, index (group.heading)}
+				<div class="tool-group" use:reveal={Math.min(index, 3) * 60}>
+					<h3 class="tool-heading">{group.heading}</h3>
+					<ul class="chips">
+						{#each group.tools as tool (tool)}
+							<li>{tool}</li>
+						{/each}
+					</ul>
+				</div>
+			{/each}
+
+			<div class="tool-group" use:reveal>
+				<h3 class="tool-heading">Spoken languages</h3>
+				<ul class="spoken">
+					{#each languages as language (language.name)}
+						<li><strong>{language.name}</strong> — {language.level}</li>
+					{/each}
+				</ul>
+			</div>
 		</div>
 	</section>
 
-	<footer class="shell section colophon">
-		<h2 class="eyebrow mono">
-			<span>Colophon</span>
-			<span>Built {built}</span>
-		</h2>
-		<p class="colophon-text">
-			Written in SvelteKit and prerendered to plain files, deployed to GitHub Pages by Actions. Type
-			is Fraunces, Archivo, and Spline Sans Mono; the ground is limestone and the accent is oxidised
-			copper. Every language, star count, and date in the catalogue is pulled from the GitHub API
-			while the site builds, so the page is only ever as stale as the last deploy.
+	<footer class="shell colophon">
+		<p>
+			SvelteKit, prerendered to static files and deployed to GitHub Pages by Actions. Facts are
+			taken from my
+			<a href={profile.github} rel="noopener">GitHub profile</a>; the project data is fetched from
+			the GitHub API at build time. Last built {built}.
 		</p>
-		<p class="colophon-text">
+		<p class="colophon-links">
 			<a href={profile.github} rel="noopener">github.com/{profile.handle}</a>
-			<span class="sep" aria-hidden="true">·</span>
+			<a href={profile.linkedin} rel="noopener">LinkedIn</a>
 			<a href="mailto:{profile.email}">{profile.email}</a>
 		</p>
 	</footer>
@@ -167,136 +168,165 @@
 	.topbar {
 		position: sticky;
 		top: 0;
-		z-index: 5;
-		background: color-mix(in srgb, var(--paper) 88%, transparent);
-		backdrop-filter: blur(8px);
+		z-index: 10;
+		background: color-mix(in srgb, var(--paper) 90%, transparent);
+		backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--rule);
 	}
 
-	.topbar-inner {
+	.bar {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
-		padding-block: 0.75rem;
+		gap: 1.5rem;
+		padding-block: 0.85rem;
 	}
 
 	.wordmark {
 		font-family: var(--display);
-		font-variation-settings:
-			'SOFT' 0,
-			'WONK' 1,
-			'opsz' 40;
+		font-weight: 700;
 		font-size: 1.15rem;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.02em;
+		text-decoration: none;
 		margin-right: auto;
 	}
 
-	.topbar nav {
+	.nav {
 		display: none;
-		gap: 1.4rem;
+		gap: 1.5rem;
 	}
 
-	.topbar nav a {
-		color: var(--ink-muted);
+	.nav a {
+		color: var(--muted);
 		text-decoration: none;
+		font-weight: 500;
 	}
 
-	.topbar nav a:hover {
+	.nav a:hover {
 		color: var(--ink);
 	}
 
 	.hero {
-		padding-block: clamp(4rem, 14vh, 9rem) clamp(3rem, 8vh, 5rem);
+		padding-block: clamp(3rem, 9vh, 5.5rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	.badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--accent);
+		background: var(--accent-wash);
+		border-radius: 999px;
+		padding: 0.25rem 0.8rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.dot {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: currentColor;
 	}
 
 	.name {
 		font-size: var(--step-3);
-		font-variation-settings:
-			'SOFT' 0,
-			'WONK' 1,
-			'opsz' 144;
-		max-width: 14ch;
+		font-weight: 700;
+		letter-spacing: -0.035em;
+		max-width: 16ch;
 	}
 
-	.thesis {
+	.role {
 		font-size: var(--step-1);
-		max-width: 32ch;
-		margin-top: clamp(1.5rem, 4vw, 2.4rem);
-		line-height: 1.35;
+		margin-top: 1.1rem;
+		max-width: 40ch;
 	}
 
-	.aim {
-		font-size: var(--step-1);
-		max-width: 32ch;
-		line-height: 1.35;
-		color: var(--ink-muted);
-		margin-top: 0.55rem;
+	.intro {
+		color: var(--muted);
+		margin-top: 0.9rem;
+		max-width: 56ch;
 	}
 
-	.standing {
-		display: grid;
-		grid-template-columns: 6.5rem minmax(0, 1fr);
-		gap: 0.45rem 1rem;
-		margin: clamp(2.4rem, 6vw, 3.6rem) 0 0;
-		padding-top: 1.4rem;
-		border-top: 1px solid var(--rule);
-		color: var(--ink-muted);
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.7rem;
+		margin-top: 2rem;
 	}
 
-	.standing.no-rule {
-		border-top: none;
-		padding-top: 0;
-		margin: 0;
+	.link {
+		border: 1px solid var(--rule-strong);
+		border-radius: 8px;
+		padding: 0.5rem 1.1rem;
+		text-decoration: none;
+		font-weight: 500;
+		transition:
+			border-color 0.15s ease,
+			background-color 0.15s ease;
 	}
 
-	.standing dt {
-		text-transform: uppercase;
-		letter-spacing: 0.14em;
-		font-size: 0.86em;
-		padding-top: 0.12em;
-	}
-
-	.standing dd {
-		margin: 0;
-		color: var(--ink);
+	.link:hover {
+		border-color: var(--accent);
+		background: var(--accent-wash);
 	}
 
 	.section {
-		padding-block: clamp(2.5rem, 7vw, 4.5rem);
+		padding-block: clamp(2.5rem, 6vw, 4rem);
+		border-top: 1px solid var(--rule);
 	}
 
-	/* Shared with ProjectEntry's geometry so every rail on the page lines up. */
-	.entry,
+	.section-head {
+		margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+	}
+
+	.section-head h2 {
+		font-size: var(--step-2);
+		font-weight: 700;
+	}
+
+	.section-note {
+		color: var(--muted);
+		margin-top: 0.5rem;
+		max-width: 58ch;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+		gap: 1.1rem;
+	}
+
+	.contributions {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 1.75rem;
+	}
+
 	.contribution {
 		display: grid;
-		grid-template-columns: var(--rail) minmax(0, 1fr);
-		gap: 0 clamp(1rem, 3vw, 2.5rem);
-		padding: clamp(1.75rem, 4vw, 2.9rem) 0;
+		grid-template-columns: 11rem minmax(0, 1fr);
+		gap: 0.35rem 1.5rem;
+		padding-bottom: 1.75rem;
 		border-bottom: 1px solid var(--rule);
 	}
 
-	.rail {
-		color: var(--ink-muted);
-		padding-top: 0.55rem;
-	}
-
-	.period {
-		color: var(--ink);
-		white-space: nowrap;
+	.contribution:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
 	}
 
 	.state {
 		text-transform: uppercase;
-		letter-spacing: 0.14em;
-		font-size: 0.86em;
+		color: var(--muted);
+		padding-top: 0.35rem;
 	}
 
 	.state[data-state='merged'] {
 		color: var(--accent);
 	}
 
-	.contribution-title,
-	.school-title {
+	.contribution-title {
 		font-size: var(--step-1);
 		margin-bottom: 0.35rem;
 	}
@@ -305,101 +335,82 @@
 		text-decoration: none;
 	}
 
-	.contribution-title a:hover {
-		color: var(--accent);
-	}
-
 	.ref {
-		color: var(--ink-muted);
+		color: var(--muted);
+		font-weight: 400;
 	}
 
-	.school-place {
-		color: var(--ink-muted);
-		margin-bottom: 0.6rem;
+	.detail {
+		color: var(--muted);
+		max-width: 58ch;
 	}
 
-	.summary {
-		max-width: 54ch;
-	}
-
-	.skills {
+	.tools {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-		gap: clamp(2rem, 5vw, 3.5rem);
-		padding-top: clamp(1.75rem, 4vw, 2.9rem);
+		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+		gap: clamp(1.75rem, 4vw, 2.75rem);
 	}
 
-	.skill-heading {
+	.tool-heading {
 		font-size: var(--step-1);
-		margin-bottom: 0.4rem;
+		margin-bottom: 0.85rem;
 	}
 
-	.skill-note {
-		color: var(--ink-muted);
-		margin-bottom: 1.1rem;
-		max-width: 30ch;
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
 	}
 
-	.skill-list {
+	.chips li {
+		border: 1px solid var(--rule-strong);
+		border-radius: 6px;
+		padding: 0.2rem 0.65rem;
+		font-size: var(--step--1);
+	}
+
+	.spoken {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		display: grid;
 		gap: 0.4rem;
-	}
-
-	.skill-list li {
-		padding-left: 1rem;
-		text-indent: -1rem;
-	}
-
-	.skill-list li::before {
-		content: '·';
-		color: var(--accent);
-		padding-right: 0.6rem;
+		color: var(--muted);
 	}
 
 	.colophon {
 		border-top: 1px solid var(--rule);
-		margin-top: clamp(2rem, 6vw, 4rem);
-		padding-bottom: clamp(4rem, 10vw, 7rem);
+		padding-block: clamp(2rem, 5vw, 3rem) clamp(3rem, 8vw, 5rem);
+		color: var(--muted);
 	}
 
-	.colophon-text {
-		max-width: 60ch;
-		color: var(--ink-muted);
-		padding-top: 1.6rem;
+	.colophon p {
+		max-width: 62ch;
 	}
 
-	.sep {
-		color: var(--rule);
-		padding: 0 0.5em;
+	.colophon-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+		margin-top: 1rem;
 	}
 
-	@media (min-width: 46rem) {
-		.topbar nav {
+	@media (min-width: 48rem) {
+		.nav {
 			display: flex;
 		}
 	}
 
-	@media (max-width: 42rem) {
-		.entry,
+	@media (max-width: 44rem) {
 		.contribution {
 			grid-template-columns: 1fr;
-			gap: 0.75rem;
 		}
 
-		.rail {
+		.state {
 			padding-top: 0;
-		}
-
-		.standing {
-			grid-template-columns: 1fr;
-			gap: 0.15rem;
-		}
-
-		.standing dt {
-			padding-top: 0.7rem;
 		}
 	}
 </style>

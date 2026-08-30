@@ -4,143 +4,105 @@
 
 	let { project, index }: { project: Project; index: number } = $props();
 
-	const lastPush = $derived(
+	const updated = $derived(
 		new Date(project.pushedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 	);
 </script>
 
-<article class="entry" use:reveal={Math.min(index, 3) * 70}>
-	<div class="rail mono">
-		<span class="period">{project.period}</span>
-		{#if project.language}<span class="lang">{project.language}</span>{/if}
-	</div>
-
-	<div class="body">
-		<h3 class="title">
+<article class="card" use:reveal={Math.min(index, 3) * 60}>
+	<header class="head">
+		<h3 class="name">
 			<a href={project.url} rel="noopener">{project.repo}</a>
 		</h3>
+		<span class="period mono">{project.period}</span>
+	</header>
 
-		<p class="summary">{project.summary}</p>
+	<p class="summary">{project.summary}</p>
 
-		<dl class="spec mono">
-			<dt>exposes</dt>
-			<dd class="exposes">
-				{#each project.exposes as capability, i (capability)}<span class="capability"
-						>{capability}</span
-					>{#if i < project.exposes.length - 1}<span class="sep" aria-hidden="true">·</span
-						>{/if}{/each}
-			</dd>
+	<ul class="stack">
+		{#each project.exposes as tool (tool)}
+			<li>{tool}</li>
+		{/each}
+	</ul>
 
-			<dt>touched</dt>
-			<dd>
-				{lastPush}{#if project.stars > 0}<span class="stars">, {project.stars} starred</span>{/if}
-			</dd>
-
-			<dt>source</dt>
-			<dd><a href={project.url} rel="noopener">github.com/Gren-95/{project.repo}</a></dd>
-		</dl>
-	</div>
+	<footer class="meta mono">
+		{#if project.language}<span>{project.language}</span>{/if}
+		{#if project.stars > 0}<span>{project.stars} ★</span>{/if}
+		<span>Updated {updated}</span>
+	</footer>
 </article>
 
 <style>
-	.entry {
-		display: grid;
-		grid-template-columns: var(--rail) minmax(0, 1fr);
-		gap: 0 clamp(1rem, 3vw, 2.5rem);
-		padding: clamp(1.75rem, 4vw, 2.9rem) 0;
-		border-bottom: 1px solid var(--rule);
-	}
-
-	.rail {
+	.card {
 		display: flex;
 		flex-direction: column;
-		gap: 0.25rem;
-		color: var(--ink-muted);
-		padding-top: 0.55rem;
+		gap: 0.85rem;
+		background: var(--raised);
+		border: 1px solid var(--rule);
+		border-radius: 10px;
+		padding: clamp(1.25rem, 3vw, 1.75rem);
+		transition:
+			border-color 0.15s ease,
+			transform 0.15s ease;
 	}
 
-	.period {
-		color: var(--ink);
-		white-space: nowrap;
+	.card:hover {
+		border-color: var(--accent);
+		transform: translateY(-2px);
 	}
 
-	.lang {
-		font-size: 0.92em;
+	.head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
 	}
 
-	.title {
-		font-size: var(--step-2);
-		margin-bottom: 0.5rem;
+	.name {
+		font-size: var(--step-1);
 	}
 
-	.title a {
+	.name a {
 		text-decoration: none;
 	}
 
-	.title a:hover {
-		color: var(--accent);
+	.period {
+		color: var(--muted);
+		white-space: nowrap;
 	}
 
 	.summary {
-		max-width: 54ch;
 		color: var(--ink);
-		margin-bottom: 1.35rem;
+		flex: 1;
 	}
 
-	.spec {
-		display: grid;
-		grid-template-columns: 5.5rem minmax(0, 1fr);
-		gap: 0.4rem 1rem;
+	.stack {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		list-style: none;
 		margin: 0;
-		color: var(--ink-muted);
+		padding: 0;
 	}
 
-	.spec dt {
-		text-transform: uppercase;
-		letter-spacing: 0.14em;
-		font-size: 0.86em;
-		padding-top: 0.12em;
-	}
-
-	.spec dd {
-		margin: 0;
-		min-width: 0;
-	}
-
-	/* The accent lives here and nowhere else, so the capabilities read as one
-	   continuous thread down the catalogue. */
-	.capability {
+	.stack li {
+		font-family: var(--mono);
+		font-size: var(--step--1);
 		color: var(--accent);
+		background: var(--accent-wash);
+		border-radius: 999px;
+		padding: 0.15rem 0.65rem;
 	}
 
-	.sep {
-		color: var(--rule);
-		padding: 0 0.45em;
-	}
-
-	.stars {
-		color: var(--ink-muted);
-	}
-
-	@media (max-width: 42rem) {
-		.entry {
-			grid-template-columns: 1fr;
-			gap: 0.75rem;
-		}
-
-		.rail {
-			flex-direction: row;
-			gap: 0.9rem;
-			padding-top: 0;
-		}
-
-		.spec {
-			grid-template-columns: 1fr;
-			gap: 0.15rem;
-		}
-
-		.spec dt {
-			padding-top: 0.7rem;
-		}
+	/* Separators are gaps, not pseudo-element dots: a wrapped row must never
+	   start a line with a dangling middot. */
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.1rem 1.15rem;
+		color: var(--muted);
+		padding-top: 0.55rem;
+		border-top: 1px solid var(--rule);
+		margin-top: auto;
 	}
 </style>

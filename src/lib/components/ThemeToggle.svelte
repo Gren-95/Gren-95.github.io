@@ -16,8 +16,8 @@
 	}
 </script>
 
-<button class="mono toggle" onclick={toggle} aria-pressed={theme === 'dark'}>
-	{theme === 'light' ? 'Dim' : 'Lift'}
+<button class="toggle" onclick={toggle} aria-pressed={theme === 'dark'}>
+	{theme === 'light' ? 'Dark' : 'Light'}
 </button>
 
 <style>
