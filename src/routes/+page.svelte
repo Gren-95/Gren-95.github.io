@@ -16,8 +16,9 @@
 
 	const sections = [
 		{ id: 'work', label: 'Work' },
-		{ id: 'education', label: 'Education' },
 		{ id: 'projects', label: 'Projects' },
+		{ id: 'upstream', label: 'Open source' },
+		{ id: 'education', label: 'Education' },
 		{ id: 'toolkit', label: 'Toolkit' }
 	];
 </script>
@@ -66,6 +67,11 @@
 
 		<p class="intro enter" style="--d: 600ms">{profile.intro}</p>
 
+		<p class="highlight enter" style="--d: 640ms">
+			Most recently, a device definition of mine was
+			<a href={contributions[0].url} rel="noopener">merged into zigbee2mqtt</a>'s converter library.
+		</p>
+
 		<div class="links enter" style="--d: 680ms">
 			<a class="link" href={profile.github} rel="noopener">GitHub</a>
 			<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
@@ -79,14 +85,6 @@
 			<p class="section-note">One employer, two roles.</p>
 		</div>
 		<PostList posts={work} />
-	</section>
-
-	<section class="shell section" id="education">
-		<div class="section-head">
-			<h2>Education</h2>
-			<p class="section-note">Vocational, in Estonia.</p>
-		</div>
-		<PostList posts={education} />
 	</section>
 
 	<section class="shell section" id="projects">
@@ -103,11 +101,10 @@
 			{/each}
 		</div>
 	</section>
-
 	<section class="shell section" id="upstream">
 		<div class="section-head">
-			<h2>Upstream</h2>
-			<p class="section-note">Work sent to projects other people maintain.</p>
+			<h2>Open source</h2>
+			<p class="section-note">Work reviewed and merged by maintainers of projects I do not own.</p>
 		</div>
 		<ol class="contributions">
 			{#each contributions as contribution, index (contribution.url)}
@@ -125,7 +122,13 @@
 			{/each}
 		</ol>
 	</section>
-
+	<section class="shell section" id="education">
+		<div class="section-head">
+			<h2>Education</h2>
+			<p class="section-note">Vocational, in Estonia.</p>
+		</div>
+		<PostList posts={education} />
+	</section>
 	<section class="shell section" id="toolkit">
 		<div class="section-head">
 			<h2>Toolkit</h2>
@@ -242,39 +245,7 @@
 	}
 
 	.hero {
-		position: relative;
-		isolation: isolate;
 		padding-block: clamp(3rem, 9vh, 5.5rem) clamp(2.5rem, 6vh, 4rem);
-	}
-
-	/* Ambient wash behind the hero. Kept faint so the type keeps its measured
-	   contrast; it drifts rather than pulses so it never pulls the eye. */
-	.hero::before {
-		content: '';
-		position: absolute;
-		inset: -30% -15% -10%;
-		z-index: -1;
-		pointer-events: none;
-		background:
-			radial-gradient(
-				34rem 20rem at 14% 22%,
-				color-mix(in oklab, var(--accent) 20%, transparent),
-				transparent 70%
-			),
-			radial-gradient(
-				28rem 18rem at 84% 6%,
-				color-mix(in oklab, var(--accent) 12%, transparent),
-				transparent 70%
-			);
-		opacity: 0.55;
-		filter: blur(6px);
-		animation: drift 13s ease-in-out infinite alternate;
-	}
-
-	@keyframes drift {
-		to {
-			transform: translate3d(6%, 3.5%, 0) scale(1.14);
-		}
 	}
 
 	.badge {
@@ -332,6 +303,16 @@
 		color: var(--muted);
 		margin-top: 0.9rem;
 		max-width: 56ch;
+	}
+
+	.highlight {
+		margin-top: 0.9rem;
+		max-width: 56ch;
+	}
+
+	.highlight a {
+		color: var(--accent);
+		text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
 	}
 
 	.links {
@@ -535,10 +516,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		.letter,
 		.enter {
-			animation: none;
-		}
-
-		.hero::before {
 			animation: none;
 		}
 

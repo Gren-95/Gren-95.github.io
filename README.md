@@ -107,8 +107,17 @@ Every effect is a progressive enhancement, and all of them are dropped under
 | Name assembles letter by letter                         | staggered `animation-delay`          | —                |
 | Ambient wash drifting behind the hero                   | animated radial gradients            | static gradient  |
 
-The hero wash is deliberately faint: measured over its strongest point, muted
-text still reads at 6.5:1 against AA's 4.5:1 floor.
+Two effects were deliberately removed rather than kept: an animated aurora
+gradient behind the hero, and a cursor-tracking glow on the project cards.
+Both are heavily commoditised — the card glow in particular is the "Linear
+look", catalogued offender-by-offender at
+[HenrikZabel/linearlike](https://github.com/HenrikZabel/linearlike). Stacking
+recognisable effects reads as a shopping list; what is left is motion that
+either responds to input or points at something.
+
+`animation-timeline: scroll()` is avoided on purpose: Firefox 154 still
+reports it unsupported, so the progress bar is driven from a scroll listener
+instead.
 
 ## Deployment
 
