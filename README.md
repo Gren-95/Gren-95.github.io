@@ -119,6 +119,23 @@ either responds to input or points at something.
 reports it unsupported, so the progress bar is driven from a scroll listener
 instead.
 
+### The section backdrop
+
+A fixed layer behind the page swaps pattern as each section reaches the middle
+of the viewport. The patterns are not arbitrary — each encodes something about
+its section: ruled lines for work (a career is a list of dates), a lattice of
+nodes for projects, rings radiating outward for open source, evenly spaced
+verticals for education (the patch panel behind the Rakvere coursework), and a
+dense field of points for the toolkit.
+
+It is masked so it runs at full strength out in the page margins and at 42%
+across the content column. That was measured, not assumed: at full strength
+behind text, muted type fell to **3.34:1**, under the 4.5:1 floor. Masked, the
+worst case behind text is **5.90:1** on light and **5.18:1** on dark, while the
+margins keep the pattern visible. On a narrow viewport `50% - 34rem` goes
+negative, so the whole strip falls inside the damped band and mobile is safe
+without a media query.
+
 ## Deployment
 
 `.github/workflows/deploy.yml` runs on every push to `main`: install, format

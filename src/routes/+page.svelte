@@ -2,6 +2,7 @@
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import SectionBackdrop from '$lib/components/SectionBackdrop.svelte';
 	import { reveal } from '$lib/actions/reveal';
 	import { scrollProgress } from '$lib/actions/scrollProgress';
 	import { profile } from '$lib/data/profile';
@@ -43,8 +44,10 @@
 	</div>
 </header>
 
+<SectionBackdrop />
+
 <main id="top">
-	<section class="shell hero">
+	<section class="shell hero" data-backdrop="hero">
 		{#if profile.available}
 			<p class="badge mono enter" style="--d: 0ms">
 				<span class="dot" aria-hidden="true"></span> Open to work
@@ -68,8 +71,8 @@
 		<p class="intro enter" style="--d: 600ms">{profile.intro}</p>
 
 		<p class="highlight enter" style="--d: 640ms">
-			Most recently, a device definition of mine was
-			<a href={contributions[0].url} rel="noopener">merged into zigbee2mqtt</a>'s converter library.
+			Most recently, a device definition of mine was merged into
+			<a href={contributions[0].url} rel="noopener">zigbee2mqtt’s converter library</a>.
 		</p>
 
 		<div class="links enter" style="--d: 680ms">
@@ -79,7 +82,7 @@
 		</div>
 	</section>
 
-	<section class="shell section" id="work">
+	<section class="shell section" id="work" data-backdrop="work">
 		<div class="section-head">
 			<h2>Work</h2>
 			<p class="section-note">One employer, two roles.</p>
@@ -87,7 +90,7 @@
 		<PostList posts={work} />
 	</section>
 
-	<section class="shell section" id="projects">
+	<section class="shell section" id="projects" data-backdrop="projects">
 		<div class="section-head">
 			<h2>Projects</h2>
 			<p class="section-note">
@@ -101,7 +104,7 @@
 			{/each}
 		</div>
 	</section>
-	<section class="shell section" id="upstream">
+	<section class="shell section" id="upstream" data-backdrop="upstream">
 		<div class="section-head">
 			<h2>Open source</h2>
 			<p class="section-note">Work reviewed and merged by maintainers of projects I do not own.</p>
@@ -122,14 +125,14 @@
 			{/each}
 		</ol>
 	</section>
-	<section class="shell section" id="education">
+	<section class="shell section" id="education" data-backdrop="education">
 		<div class="section-head">
 			<h2>Education</h2>
 			<p class="section-note">Vocational, in Estonia.</p>
 		</div>
 		<PostList posts={education} />
 	</section>
-	<section class="shell section" id="toolkit">
+	<section class="shell section" id="toolkit" data-backdrop="toolkit">
 		<div class="section-head">
 			<h2>Toolkit</h2>
 			<p class="section-note">What I have actually put into production or into a homelab.</p>
