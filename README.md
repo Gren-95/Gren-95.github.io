@@ -90,7 +90,11 @@ cyan-700 on the light theme so it clears WCAG AA. Measured against their
 grounds: body text 16.7:1, muted text 7.3:1, accent 5.1:1.
 
 Type is Bricolage Grotesque (display), Archivo (body), and Spline Sans Mono
-(dates and tags). Nothing on the page is set below 14px. Light and dark both
+(dates and tags), **self-hosted** from `static/fonts`. Google's stylesheet is
+render-blocking and has to resolve before a single font byte is requested, so
+serving from this origin removes a serialised DNS, TLS and fetch before text
+can paint. The three latin files are preloaded; Vietnamese subsets are dropped,
+and latin-ext is declared but only fetched when a glyph needs it. Nothing on the page is set below 14px. Light and dark both
 ship; the choice is stored per browser and settled before first paint.
 
 ### Motion
