@@ -47,7 +47,7 @@ export const projects: CuratedProject[] = [
 		repo: 'esc2pipe',
 		period: '2023—2024',
 		summary:
-			'Some keyboard layouts have no pipe key at all, which makes shell work miserable. These plugins bind one to Escape for Bash, Zsh and Fish alike, so the same muscle memory works whichever shell you land in.',
-		exposes: ['Bash', 'Zsh', 'Fish']
+			'Some keyboard layouts hide the pipe character behind a combination a laptop cannot produce. This binds it to Escape in fish, so a key nobody uses at a prompt types the one you need constantly.',
+		exposes: ['fish', 'Fisher', 'shell']
 	}
 ];
