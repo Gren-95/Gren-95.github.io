@@ -2,8 +2,6 @@
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import SectionBackdrop from '$lib/components/SectionBackdrop.svelte';
-	import { watchSection } from '$lib/state/activeSection.svelte';
 	import { reveal } from '$lib/actions/reveal';
 	import { scrollProgress } from '$lib/actions/scrollProgress';
 	import { profile } from '$lib/data/profile';
@@ -45,10 +43,8 @@
 	</div>
 </header>
 
-<SectionBackdrop />
-
 <main id="top">
-	<section class="shell hero" use:watchSection={'hero'}>
+	<section class="shell hero">
 		{#if profile.available}
 			<p class="badge mono enter" style="--d: 0ms">
 				<span class="dot" aria-hidden="true"></span> Open to work
@@ -83,7 +79,7 @@
 		</div>
 	</section>
 
-	<section class="shell section" id="work" use:watchSection={'work'}>
+	<section class="shell section" id="work">
 		<div class="section-head">
 			<h2>Work</h2>
 			<p class="section-note">One employer, two roles.</p>
@@ -91,7 +87,7 @@
 		<PostList posts={work} />
 	</section>
 
-	<section class="shell section" id="projects" use:watchSection={'projects'}>
+	<section class="shell section" id="projects">
 		<div class="section-head">
 			<h2>Projects</h2>
 			<p class="section-note">
@@ -105,7 +101,7 @@
 			{/each}
 		</div>
 	</section>
-	<section class="shell section" id="upstream" use:watchSection={'upstream'}>
+	<section class="shell section" id="upstream">
 		<div class="section-head">
 			<h2>Open source</h2>
 			<p class="section-note">Work reviewed and merged by maintainers of projects I do not own.</p>
@@ -126,14 +122,14 @@
 			{/each}
 		</ol>
 	</section>
-	<section class="shell section" id="education" use:watchSection={'education'}>
+	<section class="shell section" id="education">
 		<div class="section-head">
 			<h2>Education</h2>
 			<p class="section-note">Vocational, in Estonia.</p>
 		</div>
 		<PostList posts={education} />
 	</section>
-	<section class="shell section" id="toolkit" use:watchSection={'toolkit'}>
+	<section class="shell section" id="toolkit">
 		<div class="section-head">
 			<h2>Toolkit</h2>
 			<p class="section-note">What I have actually put into production or into a homelab.</p>

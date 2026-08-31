@@ -119,7 +119,7 @@ either responds to input or points at something.
 reports it unsupported, so the progress bar is driven from a scroll listener
 instead.
 
-### The section backdrop
+## The section backdrop
 
 A fixed layer behind the page swaps pattern as each section reaches the middle
 of the viewport. The patterns are not arbitrary — each encodes something about
