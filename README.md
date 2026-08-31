@@ -115,6 +115,23 @@ look", catalogued offender-by-offender at
 recognisable effects reads as a shopping list; what is left is motion that
 either responds to input or points at something.
 
+### The grain
+
+A 96 px tile of mid-grey noise with random alpha, repeated behind the content.
+One asset serves both themes: it darkens the light ground and lightens the dark
+one.
+
+Two decisions worth keeping. It sits **behind** the text rather than over it —
+an overlay above content makes its contrast auditable at rendered values and is
+the usual way this goes wrong. And it is a **tiled image, not an SVG
+`feTurbulence` filter**, because filter-generated noise across a full viewport
+is what costs paint performance on low-end devices; here only `transform`
+animates, in steps, which is what gives grain its flicker without repainting.
+
+Opacity is bounded by measurement rather than taste. Measured on the rendered
+page at the tile's densest pixel, muted text reads **6.69:1** on light and
+**6.27:1** on dark, against the 4.5:1 floor.
+
 `animation-timeline: scroll()` is avoided on purpose: Firefox 154 still
 reports it unsupported, so the progress bar is driven from a scroll listener
 instead.

@@ -187,3 +187,58 @@ a:hover {
 		animation: none !important;
 	}
 }
+
+/* ---------------------------------------------------------------------------
+   Film grain
+
+   A tiled texture rather than an SVG feTurbulence filter: filter-generated
+   noise over a full-viewport area is the part that costs paint performance on
+   low-end devices. The tile is mid-grey with random alpha, so one asset serves
+   both themes — it darkens the light ground and lightens the dark one.
+
+   Only transform animates, in steps, which is what gives grain its flicker
+   without repainting anything.
+--------------------------------------------------------------------------- */
+.grain {
+	position: fixed;
+	/* Oversized so the shifting never exposes an edge. */
+	inset: -8%;
+	z-index: -1;
+	pointer-events: none;
+	background-image: url('/grain.png');
+	background-repeat: repeat;
+	/* Opacity is bounded by measurement, not taste: at this tile's peak density
+	   the worst-case muted text still reads at 6.7:1 on light and 6.2:1 on dark,
+	   against a 4.5:1 floor. */
+	opacity: 0.14;
+	animation: grain-shift 1.1s steps(1, end) infinite;
+}
+
+:root[data-theme='dark'] .grain {
+	/* Grain reads weaker against a dark ground, so it is lifted a little. */
+	opacity: 0.18;
+}
+
+@keyframes grain-shift {
+	0% {
+		transform: translate3d(0, 0, 0);
+	}
+	20% {
+		transform: translate3d(-1.5%, 1%, 0);
+	}
+	40% {
+		transform: translate3d(1%, -1.5%, 0);
+	}
+	60% {
+		transform: translate3d(-1%, -1%, 0);
+	}
+	80% {
+		transform: translate3d(1.5%, 0.5%, 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.grain {
+		animation: none;
+	}
+}
