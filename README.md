@@ -213,6 +213,18 @@ bar carries a 1px outline so nothing dissolves into either surface. Sorted bars
 are used instead of one stacked bar because with fourteen languages the smallest
 would be a two-percent sliver.
 
+## Images
+
+Renders in the 3D section come from the earlier portfolio at
+[Gren-95/Portfoolio5](https://github.com/Gren-95/Portfoolio5), which shipped
+them as PNGs totalling 1.29 MB for the three. Re-encoded to WebP at 900 px they
+come to **61 KB**, 95% smaller, with no visible loss at 2x zoom — that
+repository is 25 MB, largely because it also carries uncompressed BMPs.
+
+Three of the nine models are shown. The other six are the exercises leading up
+to them — a navigation cube, a Lego brick, a stool, snowflakes — and including
+them would bury the ones worth looking at.
+
 ## Repository conventions
 
 - `main` is protected: changes land through a pull request, squash-merged,

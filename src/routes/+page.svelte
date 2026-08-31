@@ -1,12 +1,14 @@
 <script lang="ts">
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
 	import LanguageMix from '$lib/components/LanguageMix.svelte';
+	import ModelGrid from '$lib/components/ModelGrid.svelte';
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { reveal } from '$lib/actions/reveal';
 	import { scrollProgress } from '$lib/actions/scrollProgress';
 	import { profile } from '$lib/data/profile';
 	import { contributions } from '$lib/data/contributions';
+	import { models } from '$lib/data/models';
 	import { work, education, languages } from '$lib/data/qualifications';
 	import type { PageData } from './$types';
 
@@ -23,6 +25,7 @@
 		{ id: 'work', label: 'Work' },
 		{ id: 'projects', label: 'Projects' },
 		{ id: 'upstream', label: 'Open source' },
+		{ id: 'modelling', label: 'Modelling' },
 		{ id: 'education', label: 'Education' },
 		{ id: 'toolkit', label: 'Toolkit' }
 	];
@@ -130,6 +133,17 @@
 			{/each}
 		</ol>
 	</section>
+	<section class="shell section" id="modelling">
+		<div class="section-head">
+			<h2>3D modelling</h2>
+			<p class="section-note">
+				Three of nine coursework models. Tinkercad and SketchUp for the set exercises, Blender when
+				the set tool was Windows-only.
+			</p>
+		</div>
+		<ModelGrid {models} />
+	</section>
+
 	<section class="shell section" id="education">
 		<div class="section-head">
 			<h2>Education</h2>
