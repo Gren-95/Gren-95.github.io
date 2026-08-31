@@ -13,6 +13,7 @@ export const profile = {
 		'I build web applications, maintain IT infrastructure, and work on homelab and open source projects in my spare time.',
 	available: true,
 	email: 'efemarko1@gmail.com',
+	site: 'https://gren-95.github.io/',
 	github: 'https://github.com/Gren-95',
 	linkedin: 'https://www.linkedin.com/in/efe-marko-g%C3%BCldere-204724371/'
 } as const;
