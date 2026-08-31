@@ -28,13 +28,5 @@ export const contributions: Contribution[] = [
 		state: 'merged',
 		summary:
 			'The photograph for that same sensor, cut to the documentation’s 512 px transparent-PNG convention.'
-	},
-	{
-		project: 'JetBrains swot',
-		reference: '#19596',
-		url: 'https://github.com/JetBrains/swot/pull/19596',
-		state: 'merged',
-		summary:
-			'Added Rakvere Ametikool to the list of accredited schools JetBrains checks, so its students can claim a free licence with their school address.'
 	}
 ];

@@ -11,6 +11,10 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// Small numbers read better spelled out in prose than as numerals.
+	const spelled = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+	const contributionCount = spelled[contributions.length] ?? String(contributions.length);
+
 	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
 	const letters = profile.name.split('').map((letter) => (letter === ' ' ? '\u00A0' : letter));
 
@@ -69,8 +73,8 @@
 
 		<p class="highlight enter" style="--d: 640ms">
 			Most recently I fixed a blocking call on Home Assistant’s event loop in the
-			<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of four
-			contributions merged by maintainers of projects I do not own.
+			<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of
+			{contributionCount} contributions merged by maintainers of projects I do not own.
 		</p>
 
 		<div class="links enter" style="--d: 680ms">
