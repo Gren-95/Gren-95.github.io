@@ -5,6 +5,7 @@
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { reveal } from '$lib/actions/reveal';
+	import { base } from '$app/paths';
 	import { scrollProgress } from '$lib/actions/scrollProgress';
 	import { profile } from '$lib/data/profile';
 	import { contributions } from '$lib/data/contributions';
@@ -80,6 +81,8 @@
 	{@html `<script type="application/ld+json">${JSON.stringify(personSchema)}</script>`}
 </svelte:head>
 
+<a class="skip-link" href="#work">Skip to the content</a>
+
 <header class="topbar" use:scrollProgress>
 	<div class="shell bar">
 		<a class="wordmark" href="#top">{profile.handle}</a>
@@ -126,6 +129,7 @@
 			<a class="link" href={profile.github} rel="noopener">GitHub</a>
 			<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
 			<a class="link" href="mailto:{profile.email}">Email</a>
+			<a class="link" href="{base}/cv.pdf">CV (PDF)</a>
 		</div>
 	</section>
 

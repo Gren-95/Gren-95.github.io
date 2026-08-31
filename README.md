@@ -242,6 +242,23 @@ at 1200x630 rather than editing the PNG.
 The JSON-LD is built from the same data the page renders — employer, schools,
 spoken languages, profile links — so it cannot contradict what a reader sees.
 
+## The CV
+
+`/cv` is a print-styled route built from the same data as the site, so it
+cannot drift out of step with it. `static/cv.pdf` is that route printed to
+paper size.
+
+To regenerate the PDF after changing any of the data:
+
+```bash
+pnpm run build && (cd build && python3 -m http.server 4190) &
+chromium --headless --no-pdf-header-footer \
+  --print-to-pdf=static/cv.pdf http://127.0.0.1:4190/cv/
+```
+
+The print stylesheet forces the light palette regardless of the reader's
+theme — printing the dark one produces an ink-heavy, unreadable CV.
+
 ## Repository conventions
 
 - `main` is protected: changes land through a pull request, squash-merged,
