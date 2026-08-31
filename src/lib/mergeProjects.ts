@@ -9,6 +9,7 @@ export interface GitHubRepo {
 	html_url: string;
 	description: string | null;
 	homepage: string | null;
+	fork: boolean;
 }
 
 /**

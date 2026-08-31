@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
+	import LanguageMix from '$lib/components/LanguageMix.svelte';
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -100,6 +101,8 @@
 				GitHub API when the site builds.
 			</p>
 		</div>
+		<LanguageMix languages={data.languages} classified={data.classified} />
+
 		<div class="grid">
 			{#each data.projects as project, index (project.repo)}
 				<ProjectEntry {project} {index} />

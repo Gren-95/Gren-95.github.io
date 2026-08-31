@@ -11,6 +11,7 @@ function repo(overrides: Partial<GitHubRepo> & { name: string }): GitHubRepo {
 		html_url: `https://github.com/Gren-95/${overrides.name}`,
 		description: null,
 		homepage: null,
+		fork: false,
 		...overrides
 	};
 }
