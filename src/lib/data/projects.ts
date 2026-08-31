@@ -13,7 +13,8 @@ export const projects: CuratedProject[] = [
 		period: '2025—2026',
 		summary:
 			'Most Hyprland setups stitch together other people’s widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead — bar, notifications, launcher, on-screen displays — so it behaves as one piece. It is what I run every day.',
-		exposes: ['QML', 'Quickshell', 'Hyprland', 'Wayland']
+		exposes: ['QML', 'Quickshell', 'Hyprland', 'Wayland'],
+		shot: { src: 'shots/hyprland-dots.webp', width: 896, height: 784 }
 	},
 	{
 		repo: 'tailboard',
@@ -34,7 +35,8 @@ export const projects: CuratedProject[] = [
 		period: '2026',
 		summary:
 			'Friends kept asking me to spin up Minecraft worlds, which meant an SSH session every time. Spawnpoint puts start, stop, backups and the server console in a browser, so they can do it without me.',
-		exposes: ['TypeScript', 'self-hosted', 'backups', 'console']
+		exposes: ['TypeScript', 'self-hosted', 'backups', 'console'],
+		shot: { src: 'shots/spawnpoint.webp', width: 900, height: 553 }
 	},
 	{
 		repo: 'ha-elering-ee',
