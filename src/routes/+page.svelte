@@ -130,7 +130,7 @@
 	<section class="shell section" id="education">
 		<div class="section-head">
 			<h2>Education</h2>
-			<p class="section-note">Vocational, in Estonia.</p>
+			<p class="section-note">Vocational, then applied higher education.</p>
 		</div>
 		<PostList posts={education} />
 	</section>
