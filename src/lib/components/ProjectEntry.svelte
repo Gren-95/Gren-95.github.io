@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Project } from '$lib/types/project';
 	import { reveal } from '$lib/actions/reveal';
+	import { base } from '$app/paths';
 	import { languageColor } from '$lib/data/languageColors';
 
 	let { project, index }: { project: Project; index: number } = $props();
@@ -13,6 +14,20 @@
 </script>
 
 <article class="card" style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
+	{#if project.shot}
+		<!-- Fixed aspect with object-fit, so screenshots of different shapes do
+		     not make the grid ragged. -->
+		<img
+			class="shot"
+			src="{base}/{project.shot.src}"
+			alt="{project.repo} in use"
+			width={project.shot.width}
+			height={project.shot.height}
+			loading="lazy"
+			decoding="async"
+		/>
+	{/if}
+
 	<header class="head">
 		<h3 class="name">
 			<a href={project.url} rel="noopener">{project.repo}</a>
@@ -121,6 +136,18 @@
 		.card:hover {
 			transform: none;
 		}
+	}
+
+	.shot {
+		display: block;
+		width: calc(100% + 2 * clamp(1.25rem, 3vw, 1.75rem));
+		margin: calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) 0.15rem;
+		/* Natural aspect, no forced ratio. The two screenshots are very
+		   different shapes; cropping to a common ratio magnified the square one
+		   until it was unreadable, and letterboxing it left half the panel
+		   empty. Uneven image heights are the honest trade. */
+		height: auto;
+		border-bottom: 1px solid var(--rule);
 	}
 
 	.head {
