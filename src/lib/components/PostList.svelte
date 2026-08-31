@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import type { Post } from '$lib/data/qualifications';
 	import { reveal } from '$lib/actions/reveal';
 
@@ -10,6 +11,22 @@
 		<li class="post" use:reveal={index * 60}>
 			<span class="period mono">{post.period}</span>
 			<div>
+				{#if post.logo}
+					<!-- The marks are brand colours on transparency: TalTech's magenta
+					     disappears on the dark theme and Rakvere's pale blue on the
+					     light one, so both sit on a fixed light tile instead of the
+					     page ground. -->
+					<span class="crest">
+						<img
+							src="{base}/{post.logo.src}"
+							alt="{post.place} logo"
+							width={post.logo.width}
+							height={post.logo.height}
+							loading="lazy"
+							decoding="async"
+						/>
+					</span>
+				{/if}
 				<h3 class="title">{post.title}</h3>
 				<p class="place">
 					{#if post.placeUrl}
@@ -49,6 +66,26 @@
 	.period {
 		color: var(--muted);
 		padding-top: 0.35rem;
+	}
+
+	.crest {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: #ffffff;
+		border: 1px solid var(--rule-strong);
+		border-radius: 8px;
+		padding: 0.4rem 0.6rem;
+		margin-bottom: 0.7rem;
+		height: 2.9rem;
+	}
+
+	.crest img {
+		height: 100%;
+		width: auto;
+		max-width: 11rem;
+		object-fit: contain;
+		display: block;
 	}
 
 	.title {
