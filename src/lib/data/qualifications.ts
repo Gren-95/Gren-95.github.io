@@ -27,6 +27,14 @@ export const work: Post[] = [
 
 export const education: Post[] = [
 	{
+		period: '2026 —',
+		title: 'Arukad süsteemid ja rakendusinfotehnoloogia',
+		place: 'Tallinna Tehnikaülikool',
+		placeUrl: 'https://taltech.ee/',
+		detail:
+			'Professional higher education in smart systems and applied information technology. Three and a half years, taught in Estonian, across the Kohtla-Järve and Tartu campuses. Started August 2026, while working.'
+	},
+	{
 		period: '2024 — 2026',
 		title: 'Junior Developer, EQF level 4',
 		place: 'Viljandi Kutsehariduskeskus',
