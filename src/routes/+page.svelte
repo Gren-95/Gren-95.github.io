@@ -14,6 +14,26 @@
 
 	let { data }: { data: PageData } = $props();
 
+	const personSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'Person',
+		name: profile.name,
+		alternateName: profile.handle,
+		url: profile.site,
+		image: `${profile.site}og.png`,
+		email: `mailto:${profile.email}`,
+		jobTitle: profile.role,
+		worksFor: { '@type': 'Organization', name: profile.employer, url: profile.employerUrl },
+		address: { '@type': 'PostalAddress', addressLocality: 'Rakvere', addressCountry: 'EE' },
+		alumniOf: education.map((school) => ({
+			'@type': 'EducationalOrganization',
+			name: school.place,
+			...(school.placeUrl ? { url: school.placeUrl } : {})
+		})),
+		knowsLanguage: languages.map((l) => l.name),
+		sameAs: [profile.github, profile.linkedin]
+	};
+
 	// Small numbers read better spelled out in prose than as numerals.
 	const spelled = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 	const contributionCount = spelled[contributions.length] ?? String(contributions.length);
@@ -34,9 +54,30 @@
 <svelte:head>
 	<title>{profile.name} — {profile.role}, {profile.location}</title>
 	<meta name="description" content="{profile.role} at {profile.employer}. {profile.intro}" />
+	<link rel="canonical" href={profile.site} />
+
 	<meta property="og:title" content="{profile.name} — {profile.role}" />
 	<meta property="og:description" content={profile.intro} />
 	<meta property="og:type" content="profile" />
+	<meta property="og:url" content={profile.site} />
+	<meta property="og:image" content="{profile.site}og.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="{profile.name}, {profile.role} at {profile.employer}" />
+	<meta property="og:locale" content="en_GB" />
+	<meta property="og:site_name" content={profile.name} />
+
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="{profile.name} — {profile.role}" />
+	<meta name="twitter:description" content={profile.intro} />
+	<meta name="twitter:image" content="{profile.site}og.png" />
+
+	<!--
+		Person schema, so a search engine can connect the name to the employer,
+		the schools and the profiles rather than inferring them from prose.
+		Everything here is stated on the page itself.
+	-->
+	{@html `<script type="application/ld+json">${JSON.stringify(personSchema)}</script>`}
 </svelte:head>
 
 <header class="topbar" use:scrollProgress>

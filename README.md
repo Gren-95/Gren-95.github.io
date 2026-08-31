@@ -225,6 +225,19 @@ Three of the nine models are shown. The other six are the exercises leading up
 to them — a navigation cube, a Lego brick, a stool, snowflakes — and including
 them would bury the ones worth looking at.
 
+## SEO
+
+The page carries a canonical URL, Open Graph and Twitter card metadata, a
+`Person` JSON-LD block, `sitemap.xml`, and a `robots.txt` that points at it.
+
+`static/og.png` is the social preview, 1200x630. It is rendered from an HTML
+template using the site's own typefaces and palette, so it cannot drift from
+the design by hand-editing an image. To regenerate it, screenshot that template
+at 1200x630 rather than editing the PNG.
+
+The JSON-LD is built from the same data the page renders — employer, schools,
+spoken languages, profile links — so it cannot contradict what a reader sees.
+
 ## Repository conventions
 
 - `main` is protected: changes land through a pull request, squash-merged,
