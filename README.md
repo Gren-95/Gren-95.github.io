@@ -128,13 +128,22 @@ nodes for projects, rings radiating outward for open source, evenly spaced
 verticals for education (the patch panel behind the Rakvere coursework), and a
 dense field of points for the toolkit.
 
-It is masked so it runs at full strength out in the page margins and at 42%
-across the content column. That was measured, not assumed: at full strength
-behind text, muted type fell to **3.34:1**, under the 4.5:1 floor. Masked, the
-worst case behind text is **5.90:1** on light and **5.18:1** on dark, while the
-margins keep the pattern visible. On a narrow viewport `50% - 34rem` goes
-negative, so the whole strip falls inside the damped band and mobile is safe
-without a media query.
+It is masked: full strength out in the page margins, damped to `--damp` across
+the content column. Both numbers come from measurement rather than taste.
+
+At full strength behind text, muted type falls to **3.34:1**, under the 4.5:1
+floor — a low opacity is not self-evidently safe, because what matters is the
+composited pixel. The damp factor is solved backwards from that: at the current
+line strength the column has to stay at **0.182 effective alpha** to hold muted
+text above the floor on the dark theme, which is the binding case. That puts
+the worst case within the text extent at **5.69:1** light and **4.85:1** dark,
+while the margins run 1.87x bolder than the column because nothing is written
+there.
+
+The fade finishes 3.5rem inside the column — the page gutter — so it has
+reached the damped level before any text begins. On a narrow viewport
+`50% - 34rem` goes negative, the whole strip falls inside the damped band, and
+mobile is safe with no media query.
 
 ## Deployment
 

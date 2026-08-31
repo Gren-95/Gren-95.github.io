@@ -1,52 +1,34 @@
 <script lang="ts">
+	import { activeSection } from '$lib/state/activeSection.svelte';
+
 	/**
-	 * A fixed layer behind the page that changes pattern as each section takes
-	 * the middle of the viewport.
+	 * A fixed layer behind the page whose pattern changes as each section takes
+	 * the middle of the viewport. Sections register through the watchSection
+	 * action; this component only renders what is registered.
 	 *
-	 * The patterns are not decoration for its own sake — each encodes something
-	 * about its section:
+	 * The patterns encode their section rather than decorating it:
 	 *
 	 *   work       ruled lines, like a ledger — a career is a list of dates
-	 *   projects   a scattered lattice of nodes — discrete things built
+	 *   projects   a lattice of nodes — discrete things built
 	 *   upstream   rings radiating outward — work leaving for other people
-	 *   education  evenly spaced verticals — the patch panel he cabled at Rakvere
+	 *   education  evenly spaced verticals — the patch panel cabled at Rakvere
 	 *   toolkit    a dense field of points — many small tools
 	 *
-	 * Only opacity and transform animate, both compositor-friendly, and the
-	 * whole thing is inert to assistive technology.
+	 * Only opacity and transform animate, and the whole layer is inert to
+	 * assistive technology.
 	 */
 	const patterns = ['hero', 'work', 'projects', 'upstream', 'education', 'toolkit'];
 
-	let active = $state('hero');
 	let reduced = $state(false);
 
 	$effect(() => {
 		reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-		const sections = [...document.querySelectorAll<HTMLElement>('[data-backdrop]')];
-		if (!sections.length) return;
-
-		// Only the section crossing the middle band of the viewport intersects,
-		// so there is exactly one candidate at a time and no tie to break.
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (!entry.isIntersecting) continue;
-					active = (entry.target as HTMLElement).dataset.backdrop ?? 'hero';
-				}
-			},
-			{ rootMargin: '-40% 0px -40% 0px' }
-		);
-
-		for (const section of sections) observer.observe(section);
-
-		return () => observer.disconnect();
 	});
 </script>
 
 <div class="backdrop" class:still={reduced} aria-hidden="true">
 	{#each patterns as pattern (pattern)}
-		<div class="layer" data-pattern={pattern} class:on={active === pattern}></div>
+		<div class="layer" data-pattern={pattern} class:on={activeSection.current === pattern}></div>
 	{/each}
 </div>
 
@@ -58,19 +40,25 @@
 		pointer-events: none;
 		overflow: hidden;
 
-		/* Full strength out in the page margins, damped to 42% across the
-		   content column, so the pattern never costs the text contrast. On a
-		   narrow viewport `50% - 34rem` goes negative, the whole strip falls
-		   inside the damped band, and mobile is safe without a media query.
-		   Measured rather than assumed: see the contrast note in the README. */
+		/* Full strength out in the page margins, damped across the content
+		   column so the pattern never costs the text its contrast.
+
+		   The fade finishes 3.5rem inside the column — the page gutter — so it
+		   has already reached the damped level by the time any text starts.
+		   --damp is set from a measurement, not by eye: at this line strength
+		   the column has to stay at 0.182 effective alpha to keep muted text
+		   above 4.5:1 on the dark theme, which is the binding case. On
+		   a narrow viewport `50% - 34rem` goes negative, the whole strip falls
+		   inside the damped band, and mobile is safe with no media query. */
 		--edge: 34rem;
+		--damp: 0.285;
 		--mask: linear-gradient(
 			to right,
 			#000 0,
-			#000 calc(50% - var(--edge) - 4rem),
-			rgb(0 0 0 / 0.42) calc(50% - var(--edge)),
-			rgb(0 0 0 / 0.42) calc(50% + var(--edge)),
-			#000 calc(50% + var(--edge) + 4rem),
+			#000 calc(50% - var(--edge) - 1rem),
+			rgb(0 0 0 / var(--damp)) calc(50% - var(--edge) + 3.5rem),
+			rgb(0 0 0 / var(--damp)) calc(50% + var(--edge) - 3.5rem),
+			#000 calc(50% + var(--edge) + 1rem),
 			#000 100%
 		);
 		-webkit-mask-image: var(--mask);
@@ -87,7 +75,7 @@
 		/* Only opacity transitions; the drift below owns transform, so the two
 		   never fight over the same property. */
 		transition: opacity 0.9s ease;
-		--line: color-mix(in oklab, var(--accent) 62%, transparent);
+		--line: color-mix(in oklab, var(--accent) 75%, transparent);
 	}
 
 	.layer.on {
@@ -114,7 +102,7 @@
 	}
 
 	.layer[data-pattern='work'].on {
-		opacity: 0.52;
+		opacity: 0.76;
 	}
 
 	/* projects: a lattice of nodes — discrete things built */
@@ -131,7 +119,7 @@
 	}
 
 	.layer[data-pattern='projects'].on {
-		opacity: 0.58;
+		opacity: 0.85;
 	}
 
 	/* upstream: rings radiating outward — work leaving for other people */
@@ -144,7 +132,7 @@
 	}
 
 	.layer[data-pattern='upstream'].on {
-		opacity: 0.55;
+		opacity: 0.81;
 	}
 
 	/* education: evenly spaced verticals — the patch panel he cabled at Rakvere */
@@ -153,7 +141,7 @@
 	}
 
 	.layer[data-pattern='education'].on {
-		opacity: 0.46;
+		opacity: 0.68;
 	}
 
 	/* toolkit: a dense field of points — many small tools */
@@ -163,7 +151,7 @@
 	}
 
 	.layer[data-pattern='toolkit'].on {
-		opacity: 0.55;
+		opacity: 0.81;
 	}
 
 	/* The patterns are static; only the change between them and the slow drift
