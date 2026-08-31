@@ -14,14 +14,15 @@ export const projects: CuratedProject[] = [
 		summary:
 			'Most Hyprland setups stitch together other people’s widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead — bar, notifications, launcher, on-screen displays — so it behaves as one piece. It is what I run every day.',
 		exposes: ['QML', 'Quickshell', 'Hyprland', 'Wayland'],
-		shot: { src: 'shots/hyprland-dots.webp', width: 896, height: 784 }
+		shot: { src: 'shots/hyprland-dots.webp', width: 900, height: 563 }
 	},
 	{
 		repo: 'tailboard',
 		period: '2026',
 		summary:
 			'A dozen self-hosted services means a dozen bookmarks and no idea which one is down. Tailboard puts them all on one page with their status, so the homelab has a front door instead of a folder of links.',
-		exposes: ['self-hosted', 'homelab', 'dashboard']
+		exposes: ['self-hosted', 'homelab', 'dashboard'],
+		shot: { src: 'shots/tailboard.webp', width: 900, height: 562 }
 	},
 	{
 		repo: 'sonic-siphon',
@@ -36,7 +37,7 @@ export const projects: CuratedProject[] = [
 		summary:
 			'Friends kept asking me to spin up Minecraft worlds, which meant an SSH session every time. Spawnpoint puts start, stop, backups and the server console in a browser, so they can do it without me.',
 		exposes: ['TypeScript', 'self-hosted', 'backups', 'console'],
-		shot: { src: 'shots/spawnpoint.webp', width: 900, height: 553 }
+		shot: { src: 'shots/spawnpoint.webp', width: 900, height: 563 }
 	},
 	{
 		repo: 'ha-elering-ee',
