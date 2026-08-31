@@ -175,6 +175,27 @@ all are rendered on a light tile rather than the page ground. Mean luminance of
 their opaque pixels runs from 0.06 (JELD-WEN) to 0.69 (Rakvere), so no single
 page background keeps every one of them legible.
 
+## The language mix
+
+The Projects section opens with public repositories counted by primary
+language, built from the same API call that fills the cards. Forks and
+repositories GitHub could not classify are excluded, and the denominator is
+stated rather than implied.
+
+Colours are GitHub's canonical linguist values, vendored in
+`src/lib/data/languageColors.ts`. They are deliberately **not** re-stepped to
+pass a palette validator — the point is that JavaScript yellow and Go cyan are
+recognisable. Run against a categorical validator they fail the lightness band
+and chroma floor, and four of them fall under 3:1 against one surface or the
+other: JavaScript at 1.32:1 on light, PowerShell at 1.15:1 on dark. CVD
+separation passes at 10.7 ΔE.
+
+The relief for that is structural rather than cosmetic: every mark is named and
+counted in text, so colour never has to be read on its own, and every swatch and
+bar carries a 1px outline so nothing dissolves into either surface. Sorted bars
+are used instead of one stacked bar because with fourteen languages the smallest
+would be a two-percent sliver.
+
 ## Repository conventions
 
 - `main` is protected: changes land through a pull request, squash-merged,

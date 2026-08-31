@@ -1,15 +1,18 @@
 <script lang="ts">
 	import type { Project } from '$lib/types/project';
 	import { reveal } from '$lib/actions/reveal';
+	import { languageColor } from '$lib/data/languageColors';
 
 	let { project, index }: { project: Project; index: number } = $props();
+
+	const lang = $derived(languageColor(project.language));
 
 	const updated = $derived(
 		new Date(project.pushedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 	);
 </script>
 
-<article class="card" use:reveal={Math.min(index, 3) * 60}>
+<article class="card" style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
 	<header class="head">
 		<h3 class="name">
 			<a href={project.url} rel="noopener">{project.repo}</a>
@@ -31,7 +34,9 @@
 				<span class="pulse" aria-hidden="true"></span>Live
 			</a>
 		{/if}
-		{#if project.language}<span>{project.language}</span>{/if}
+		{#if project.language}
+			<span class="lang"><span class="dot" aria-hidden="true"></span>{project.language}</span>
+		{/if}
 		{#if project.stars > 0}<span>{project.stars} ★</span>{/if}
 		<span>Updated {updated}</span>
 	</footer>
@@ -39,6 +44,7 @@
 
 <style>
 	.card {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		gap: 0.85rem;
@@ -49,6 +55,17 @@
 		transition:
 			border-color 0.15s ease,
 			transform 0.15s ease;
+	}
+
+	/* A hairline of the language's own colour along the top edge. Identity is
+	   still carried by the name in the meta row; this only reinforces it. */
+	.card::before {
+		content: '';
+		position: absolute;
+		inset: -1px -1px auto;
+		height: 3px;
+		background: var(--lang);
+		border-radius: 10px 10px 0 0;
 	}
 
 	.card:hover {
@@ -151,6 +168,21 @@
 
 	/* Separators are gaps, not pseudo-element dots: a wrapped row must never
 	   start a line with a dangling middot. */
+	.lang {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--lang);
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 28%, transparent);
+		flex: none;
+	}
+
 	.meta {
 		display: flex;
 		flex-wrap: wrap;
