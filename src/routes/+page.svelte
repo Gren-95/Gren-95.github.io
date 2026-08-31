@@ -129,6 +129,7 @@
 			<a class="link" href={profile.github} rel="noopener">GitHub</a>
 			<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
 			<a class="link" href="mailto:{profile.email}">Email</a>
+			<a class="link" href={profile.printables} rel="noopener">Printables</a>
 			<a class="link" href="{base}/cv.pdf">CV (PDF)</a>
 		</div>
 	</section>
