@@ -68,8 +68,9 @@
 		<p class="intro enter" style="--d: 600ms">{profile.intro}</p>
 
 		<p class="highlight enter" style="--d: 640ms">
-			Most recently, a device definition of mine was merged into
-			<a href={contributions[0].url} rel="noopener">zigbee2mqtt’s converter library</a>.
+			Most recently I fixed a blocking call on Home Assistant’s event loop in the
+			<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of four
+			contributions merged by maintainers of projects I do not own.
 		</p>
 
 		<div class="links enter" style="--d: 680ms">
