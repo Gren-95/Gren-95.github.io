@@ -160,8 +160,8 @@ want the site as a starting point, take the code and bring your own facts.
 Brand marks in the toolkit section belong to their respective owners and are
 included via [Simple Icons](https://simpleicons.org/) for identification only.
 
-School marks in the Education section likewise belong to their institutions and
-identify schools actually attended:
+Employer and school marks in the Work and Education sections likewise belong to
+their owners and identify places actually worked at or attended:
 
 | Mark                        | Source                                                                             | Note                                                                                                                                            |
 | --------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -169,10 +169,11 @@ identify schools actually attended:
 | Viljandi Kutsehariduskeskus | vikk.ee                                                                            | anniversary emblem cropped off, leaving the standing mark                                                                                       |
 | Rakvere Ametikool           | rak.ee                                                                             | supplied as JPEG on white; background cut to transparency                                                                                       |
 
-All three are served from `static/logos` at 96 px tall with transparent
-backgrounds, and are rendered on a light tile rather than the page ground:
-TalTech's magenta disappears on the dark theme and Rakvere's pale blue on the
-light one, so neither is legible on both without it.
+They are served from `static/logos` with transparent backgrounds — the three
+school marks as 96 px PNGs, JELD-WEN as SVG since a vector was available — and
+all are rendered on a light tile rather than the page ground. Mean luminance of
+their opaque pixels runs from 0.06 (JELD-WEN) to 0.69 (Rakvere), so no single
+page background keeps every one of them legible.
 
 ## Repository conventions
 
