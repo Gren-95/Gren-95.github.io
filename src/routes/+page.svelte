@@ -183,7 +183,8 @@
 			<h2>3D modelling</h2>
 			<p class="section-note">
 				Three of nine coursework models. Tinkercad and SketchUp for the set exercises, Blender when
-				the set tool was Windows-only.
+				the set tool was Windows-only. Printable designs are published on
+				<a href={profile.printables} rel="noopener">Printables</a>.
 			</p>
 		</div>
 		<ModelGrid {models} />

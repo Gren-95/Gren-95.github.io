@@ -14,7 +14,7 @@ export const projects: CuratedProject[] = [
 		summary:
 			'Most Hyprland setups stitch together other people’s widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead — bar, notifications, launcher, on-screen displays — so it behaves as one piece. It is what I run every day.',
 		exposes: ['QML', 'Quickshell', 'Hyprland', 'Wayland'],
-		shot: { src: 'shots/hyprland-dots.webp', width: 900, height: 563 }
+		shot: { src: 'shots/hyprland-dots.webp', width: 1200, height: 750 }
 	},
 	{
 		repo: 'tailboard',
@@ -29,7 +29,8 @@ export const projects: CuratedProject[] = [
 		period: '2025—2026',
 		summary:
 			'Every YouTube-to-MP3 site is an ad farm that wants your links on its server. This is one Go binary you run yourself: paste a playlist, get the files back, nothing leaves your machine.',
-		exposes: ['Go', 'single binary', 'self-hosted']
+		exposes: ['Go', 'single binary', 'self-hosted'],
+		shot: { src: 'shots/sonic-siphon.webp', width: 1200, height: 750 }
 	},
 	{
 		repo: 'spawnpoint',

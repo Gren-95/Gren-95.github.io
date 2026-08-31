@@ -15,5 +15,6 @@ export const profile = {
 	email: 'efemarko1@gmail.com',
 	site: 'https://gren-95.github.io/',
 	github: 'https://github.com/Gren-95',
-	linkedin: 'https://www.linkedin.com/in/efe-marko-g%C3%BCldere-204724371/'
+	linkedin: 'https://www.linkedin.com/in/efe-marko-g%C3%BCldere-204724371/',
+	printables: 'https://www.printables.com/@gren95_5197961/models'
 } as const;
