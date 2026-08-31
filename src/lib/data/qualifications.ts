@@ -17,6 +17,7 @@ export const work: Post[] = [
 		title: 'Junior Web Developer',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
+		logo: { src: 'logos/jeldwen.svg', width: 152, height: 43 },
 		detail: 'Building web applications and keeping the IT infrastructure behind them running.'
 	},
 	{
@@ -24,6 +25,7 @@ export const work: Post[] = [
 		title: 'IT Support Technician',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
+		logo: { src: 'logos/jeldwen.svg', width: 152, height: 43 },
 		detail: 'Three internships at the same company, which turned into the developer post above.'
 	}
 ];
