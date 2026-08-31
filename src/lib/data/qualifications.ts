@@ -39,7 +39,8 @@ export const education: Post[] = [
 		title: 'Junior Developer, EQF level 4',
 		place: 'Viljandi Kutsehariduskeskus',
 		placeUrl: 'https://vikk.ee/',
-		detail: 'Vocational qualification in software development.'
+		detail:
+			'AI-driven development, and the programming groundwork that makes it work: object orientation and the basics you need to judge whether generated code is any good. Less about producing code than directing the tools and catching what they get wrong.'
 	},
 	{
 		period: '2021 — 2024',
