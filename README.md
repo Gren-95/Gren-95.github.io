@@ -160,6 +160,20 @@ want the site as a starting point, take the code and bring your own facts.
 Brand marks in the toolkit section belong to their respective owners and are
 included via [Simple Icons](https://simpleicons.org/) for identification only.
 
+School marks in the Education section likewise belong to their institutions and
+identify schools actually attended:
+
+| Mark                        | Source                                                                             | Note                                                                                                                                            |
+| --------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tallinna Tehnikaülikool     | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Logo_veeb_esitlus.png) | tagged CC BY-SA 3.0, credited to Tallinn University of Technology, original at [taltech.ee/en/logos-slides](https://taltech.ee/en/logos-slides) |
+| Viljandi Kutsehariduskeskus | vikk.ee                                                                            | anniversary emblem cropped off, leaving the standing mark                                                                                       |
+| Rakvere Ametikool           | rak.ee                                                                             | supplied as JPEG on white; background cut to transparency                                                                                       |
+
+All three are served from `static/logos` at 96 px tall with transparent
+backgrounds, and are rendered on a light tile rather than the page ground:
+TalTech's magenta disappears on the dark theme and Rakvere's pale blue on the
+light one, so neither is legible on both without it.
+
 ## Repository conventions
 
 - `main` is protected: changes land through a pull request, squash-merged,
