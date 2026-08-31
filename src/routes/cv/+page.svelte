@@ -162,6 +162,14 @@
 		break-inside: avoid;
 	}
 
+	/* A4 with real margins. The previous CV, produced in Word, was A4 too, and
+	   Estonian employers expect it; Chrome's print-to-pdf otherwise defaults to
+	   US Letter with no margin at all. */
+	@page {
+		size: A4;
+		margin: 18mm 16mm;
+	}
+
 	@media print {
 		/* A CV prints on paper. Force the light palette whichever theme the
 		   reader is browsing in, or a dark-mode visitor gets an ink-heavy PDF. */
@@ -174,11 +182,23 @@
 			--rule: #dddddd;
 			--rule-strong: #999999;
 			--accent: #0e7490;
+
+			/* Must sit in this block, not on a bare html selector: the canvas
+			   behind the page margins follows colour-scheme, and
+			   :root[data-theme='dark'] outranks `html` even inside @media
+			   print, which left a white sheet in a black A4 margin. */
+			color-scheme: light;
+			background: #ffffff;
 		}
 
+		/* The page-margin area is painted from the canvas, which follows the
+		   root's colour-scheme — so overriding body alone left a white sheet
+		   floating in a black A4 margin. */
+		:global(html),
 		:global(body) {
 			background: #ffffff;
 			color: #111111;
+			color-scheme: light;
 		}
 
 		:global(.grain) {
