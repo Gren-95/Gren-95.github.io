@@ -32,7 +32,7 @@ export const education: Post[] = [
 		place: 'Tallinna Tehnikaülikool',
 		placeUrl: 'https://taltech.ee/',
 		detail:
-			'Professional higher education in smart systems and applied information technology. Three and a half years, taught in Estonian, across the Kohtla-Järve and Tartu campuses. Started August 2026, while working.'
+			'Professional higher education in smart systems and applied information technology. Three and a half years at the Kohtla-Järve campus, taught in Estonian. Started August 2026, alongside the job.'
 	},
 	{
 		period: '2024 — 2026',
@@ -47,7 +47,7 @@ export const education: Post[] = [
 		place: 'Rakvere Ametikool',
 		placeUrl: 'https://rak.ee/',
 		detail:
-			'Networks and hardware, down to terminating the cable: coursework ran to a working rack of Cisco switches, a router, a 110 block and a keystone panel.'
+			'Networks and hardware with hands on the kit: CAT 5e through CAT 7 terminated by hand, punched down to 110 blocks and keystone panels, and a rack of Cisco switches and routers cabled to be used afterwards rather than just graded. Also where I learned to coax a configuration page out of an access point too old for a modern browser to render one.'
 	}
 ];
 
