@@ -202,7 +202,7 @@
 		}
 
 		:global(.grain),
-		:global(.aurora) {
+		:global(.mesh) {
 			display: none !important;
 		}
 

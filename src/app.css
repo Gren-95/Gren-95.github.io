@@ -15,7 +15,9 @@
 	--accent-wash: #ecfeff;
 	--rule: #e7e5e4;
 	--rule-strong: #d6d3d1;
-	--aurora-strength: 13%;
+	--mesh-link: 16%;
+	--mesh-packet: 55%;
+	--mesh-node: 38%;
 
 	--display: 'Bricolage Grotesque', 'Archivo', system-ui, sans-serif;
 	--body: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -42,7 +44,6 @@
 	--accent-wash: #14343f;
 	--rule: #34302d;
 	--rule-strong: #44403c;
-	--aurora-strength: 11%;
 
 	color-scheme: dark;
 }
@@ -243,89 +244,6 @@ a:hover {
 
 @media (prefers-reduced-motion: reduce) {
 	.grain {
-		animation: none;
-	}
-}
-
-/* ---------------------------------------------------------------------------
-   Aurora
-
-   Three soft accent-coloured pools drifting behind the content. Only transform
-   animates, so nothing repaints; each pool runs on its own duration so the
-   pattern takes minutes to repeat.
-
-   Strength is bounded by measurement like the grain: at 13% the darkest point
-   of a pool still leaves muted text at 6.0:1 on light, and at 11% on dark it
-   holds 5.2:1, against a 4.5:1 floor.
---------------------------------------------------------------------------- */
-.aurora {
-	position: fixed;
-	inset: 0;
-	z-index: -1;
-	overflow: hidden;
-	pointer-events: none;
-}
-
-.aurora span {
-	position: absolute;
-	width: 70vmax;
-	height: 70vmax;
-	border-radius: 50%;
-	background: radial-gradient(
-		circle,
-		color-mix(in srgb, var(--accent) var(--aurora-strength), transparent),
-		transparent 65%
-	);
-	will-change: transform;
-}
-
-.aurora span:nth-child(1) {
-	top: -25vmax;
-	left: -20vmax;
-	animation: aurora-drift-a 34s ease-in-out infinite alternate;
-}
-
-.aurora span:nth-child(2) {
-	right: -25vmax;
-	top: 20vh;
-	animation: aurora-drift-b 44s ease-in-out infinite alternate;
-}
-
-.aurora span:nth-child(3) {
-	bottom: -30vmax;
-	left: 15vw;
-	animation: aurora-drift-c 56s ease-in-out infinite alternate;
-}
-
-@keyframes aurora-drift-a {
-	from {
-		transform: translate3d(0, 0, 0) scale(1);
-	}
-	to {
-		transform: translate3d(22vmax, 14vmax, 0) scale(1.25);
-	}
-}
-
-@keyframes aurora-drift-b {
-	from {
-		transform: translate3d(0, 0, 0) scale(1.15);
-	}
-	to {
-		transform: translate3d(-20vmax, -12vmax, 0) scale(0.9);
-	}
-}
-
-@keyframes aurora-drift-c {
-	from {
-		transform: translate3d(0, 0, 0) scale(0.95);
-	}
-	to {
-		transform: translate3d(18vmax, -16vmax, 0) scale(1.2);
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.aurora span {
 		animation: none;
 	}
 }
