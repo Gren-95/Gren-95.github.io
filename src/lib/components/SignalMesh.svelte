@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { rubberBand } from '$lib/actions/rubberBand';
+
 	// A Zigbee mesh: one coordinator, routers around it, end devices at the
 	// edges. Coordinates live in a 1600x1000 box that is sliced to the viewport.
 	const nodes = [
@@ -43,7 +45,13 @@
 		`M${nodes[from].x} ${nodes[from].y}L${nodes[to].x} ${nodes[to].y}`;
 </script>
 
-<svg class="mesh" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<svg
+	use:rubberBand
+	class="mesh"
+	viewBox="0 0 1600 1000"
+	preserveAspectRatio="xMidYMid slice"
+	aria-hidden="true"
+>
 	{#each links as [from, to, seconds, delay, reversed] (`${from}-${to}`)}
 		<path class="link" d={path(from, to)} />
 		<path
