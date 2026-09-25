@@ -201,7 +201,8 @@
 			color-scheme: light;
 		}
 
-		:global(.grain) {
+		:global(.grain),
+		:global(.aurora) {
 			display: none !important;
 		}
 
