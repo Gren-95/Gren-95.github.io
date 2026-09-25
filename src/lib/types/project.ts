@@ -9,7 +9,7 @@ export interface CuratedProject {
 	/** What the project offers, borrowing the vocabulary of a device definition. */
 	exposes: string[];
 	/** A screenshot, where the repository ships one worth showing. */
-	shot?: { src: string; width: number; height: number };
+	shot?: { src: string; width: number; height: number; alt?: string };
 }
 
 /** The live fields fetched from the GitHub API at build time. */

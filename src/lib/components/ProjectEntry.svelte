@@ -20,7 +20,7 @@
 		<img
 			class="shot"
 			src="{base}/{project.shot.src}"
-			alt="{project.repo} in use"
+			alt={project.shot.alt ?? `${project.repo} in use`}
 			width={project.shot.width}
 			height={project.shot.height}
 			loading="lazy"
