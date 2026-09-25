@@ -37,6 +37,10 @@
 
 	// Small numbers read better spelled out in prose than as numerals.
 	const spelled = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+	const projectCount = $derived.by(() => {
+		const word = spelled[data.projects.length] ?? String(data.projects.length);
+		return word.charAt(0).toUpperCase() + word.slice(1);
+	});
 	const contributionCount = spelled[contributions.length] ?? String(contributions.length);
 
 	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
@@ -97,41 +101,62 @@
 
 <main id="top">
 	<section class="shell hero">
-		{#if profile.available}
-			<p class="badge mono enter" style="--d: 0ms">
-				<span class="dot" aria-hidden="true"></span> Open to work
+		<div class="hero-copy">
+			<h1 class="name">
+				<span class="sr-only">{profile.name}</span>
+				<span aria-hidden="true">
+					{#each letters as letter, index (index)}
+						<span class="letter" style="--i: {index}">{letter}</span>
+					{/each}
+				</span>
+			</h1>
+
+			<p class="role">
+				{profile.role} at <a href={profile.employerUrl} rel="noopener">{profile.employer}</a>, based
+				in {profile.location}.
 			</p>
-		{/if}
 
-		<h1 class="name">
-			<span class="sr-only">{profile.name}</span>
-			<span aria-hidden="true">
-				{#each letters as letter, index (index)}
-					<span class="letter" style="--i: {index}">{letter}</span>
-				{/each}
-			</span>
-		</h1>
+			<p class="intro">{profile.intro}</p>
 
-		<p class="role enter" style="--d: 520ms">
-			{profile.role} at <a href={profile.employerUrl} rel="noopener">{profile.employer}</a>, based
-			in {profile.location}.
-		</p>
+			<p class="highlight">
+				Most recently I fixed a blocking call on Home Assistant’s event loop in the
+				<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of
+				{contributionCount} contributions merged by maintainers of projects I do not own.
+			</p>
 
-		<p class="intro enter" style="--d: 600ms">{profile.intro}</p>
-
-		<p class="highlight enter" style="--d: 640ms">
-			Most recently I fixed a blocking call on Home Assistant’s event loop in the
-			<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of
-			{contributionCount} contributions merged by maintainers of projects I do not own.
-		</p>
-
-		<div class="links enter" style="--d: 680ms">
-			<a class="link" href={profile.github} rel="noopener">GitHub</a>
-			<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
-			<a class="link" href="mailto:{profile.email}">Email</a>
-			<a class="link" href={profile.printables} rel="noopener">Printables</a>
-			<a class="link" href="{base}/cv.pdf">CV (PDF)</a>
+			<div class="links">
+				<a class="link" href={profile.github} rel="noopener">GitHub</a>
+				<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
+				<a class="link" href="mailto:{profile.email}">Email</a>
+				<a class="link" href={profile.printables} rel="noopener">Printables</a>
+				<a class="link" href="{base}/cv.pdf">CV (PDF)</a>
+			</div>
 		</div>
+
+		<aside class="device" aria-label="At a glance">
+			<header class="device-head">
+				<span class="device-name mono">{profile.handle}</span>
+				{#if profile.available}
+					<span class="state-pill mono"
+						><span class="dot" aria-hidden="true"></span>Open to work</span
+					>
+				{/if}
+			</header>
+			<dl class="device-fields">
+				<div>
+					<dt class="mono">projects</dt>
+					<dd>{data.projects.length} built</dd>
+				</div>
+				<div>
+					<dt class="mono">upstream</dt>
+					<dd>{contributions.length} merged</dd>
+				</div>
+				<div>
+					<dt class="mono">speaks</dt>
+					<dd>{languages.map((language) => language.name).join(', ')}</dd>
+				</div>
+			</dl>
+		</aside>
 	</section>
 
 	<section class="shell section" id="work">
@@ -146,8 +171,8 @@
 		<div class="section-head">
 			<h2>Projects</h2>
 			<p class="section-note">
-				Six things I have built, newest first. Language, stars, dates and live links come from the
-				GitHub API when the site builds.
+				{projectCount} things I have built, newest first. Language, stars, dates and live links come from
+				the GitHub API when the site builds.
 			</p>
 		</div>
 		<LanguageMix languages={data.languages} classified={data.classified} />
@@ -317,24 +342,6 @@
 		padding-block: clamp(3rem, 9vh, 5.5rem) clamp(2.5rem, 6vh, 4rem);
 	}
 
-	.badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: var(--accent);
-		background: var(--accent-wash);
-		border-radius: 999px;
-		padding: 0.25rem 0.8rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.dot {
-		width: 0.45rem;
-		height: 0.45rem;
-		border-radius: 50%;
-		background: currentColor;
-	}
-
 	.name {
 		font-size: var(--step-3);
 		font-weight: 700;
@@ -348,18 +355,91 @@
 		animation-delay: calc(var(--i) * 26ms);
 	}
 
-	/* Everything else in the hero follows the name in, one beat apart. */
-	.enter {
-		animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-		animation-delay: var(--d, 0ms);
-	}
-
 	@keyframes rise {
 		from {
 			opacity: 0;
 			transform: translateY(0.42em);
 			filter: blur(8px);
 		}
+	}
+
+	.device {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.9rem 1.75rem;
+		background: var(--raised);
+		border: 1px solid var(--rule-strong);
+		border-radius: 12px;
+		margin-top: 2.25rem;
+		padding: 0.85rem 1.25rem;
+		animation: settle 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) 0.55s both;
+	}
+
+	@keyframes settle {
+		from {
+			opacity: 0;
+			transform: translateY(0.6rem);
+		}
+	}
+
+	.device-head {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.device-name {
+		color: var(--muted);
+	}
+
+	.state-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--accent);
+		background: var(--accent-wash);
+		border-radius: 999px;
+		padding: 0.2rem 0.75rem;
+	}
+
+	.dot {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: currentColor;
+		animation: dot-ping 2.4s ease-out infinite;
+	}
+
+	@keyframes dot-ping {
+		from {
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+		}
+		to {
+			box-shadow: 0 0 0 0.6rem transparent;
+		}
+	}
+
+	.device-fields {
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.75rem;
+	}
+
+	.device-fields div {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+	}
+
+	.device-fields dt {
+		color: var(--ink);
+		font-size: 0.875rem;
+	}
+
+	.device-fields dd {
+		margin: 0;
 	}
 
 	.role {
@@ -582,9 +662,17 @@
 		}
 	}
 
+	@media (min-width: 48rem) {
+		.device-head {
+			padding-right: 1.75rem;
+			border-right: 1px solid var(--rule);
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.letter,
-		.enter {
+		.device,
+		.dot {
 			animation: none;
 		}
 
