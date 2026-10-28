@@ -2,6 +2,8 @@
 export interface CuratedProject {
 	/** GitHub repository name, also the catalogue entry's title. */
 	repo: string;
+	/** A shorter name for the card, where the repository name would wrap. */
+	title?: string;
 	/** Year or year range the work belongs to, used as the left rail marker. */
 	period: string;
 	/** One short line, always visible on the card. */
