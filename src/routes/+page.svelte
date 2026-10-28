@@ -16,6 +16,12 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// Terminal window chrome, as an easter egg: the traffic lights actually work.
+	// Red closes it (a reopen button takes its place), amber minimises to the
+	// title bar, green reveals one hidden command.
+	let termState: 'open' | 'minimized' | 'closed' = $state('open');
+	let termEgg = $state(false);
+
 	const personSchema = {
 		'@context': 'https://schema.org',
 		'@type': 'Person',
@@ -57,6 +63,43 @@
 		return word.charAt(0).toUpperCase() + word.slice(1);
 	});
 	const contributionCount = spelled[contributions.length] ?? String(contributions.length);
+
+	// Social links as symbolic marks: 24x24 fill paths rendered in currentColor,
+	// so one set works on both themes. Brand paths (GitHub, Printables) come from
+	// Simple Icons; LinkedIn is carried here since Simple Icons dropped it, and
+	// Email and CV use generic glyphs.
+	const socialLinks = [
+		{
+			label: 'GitHub',
+			href: profile.github,
+			external: true,
+			path: 'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'
+		},
+		{
+			label: 'LinkedIn',
+			href: profile.linkedin,
+			external: true,
+			path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z'
+		},
+		{
+			label: 'Email',
+			href: `mailto:${profile.email}`,
+			external: false,
+			path: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z'
+		},
+		{
+			label: 'Printables',
+			href: profile.printables,
+			external: true,
+			path: 'M3.678 4.8 12 9.6v9.6l8.322-4.8V4.8L12 0ZM12 19.2l-8.322-4.8V24Z'
+		},
+		{
+			label: 'CV (PDF)',
+			href: `${base}/cv.pdf`,
+			external: false,
+			path: 'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'
+		}
+	];
 
 	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
 	const letters = profile.name.split('').map((letter) => (letter === ' ' ? '\u00A0' : letter));
@@ -135,44 +178,88 @@
 			<p class="intro">{profile.intro}</p>
 
 			<p class="highlight">
-				Most recently I fixed a blocking call on Home Assistant's event loop in the
-				<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of
-				{contributionCount} contributions merged by maintainers of projects I don't own.
+				Most recently I've been sending fixes upstream: {contributionCount} merged into projects I don't
+				maintain.
 			</p>
 
 			<div class="links">
-				<a class="link" href={profile.github} rel="noopener">GitHub</a>
-				<a class="link" href={profile.linkedin} rel="noopener">LinkedIn</a>
-				<a class="link" href="mailto:{profile.email}">Email</a>
-				<a class="link" href={profile.printables} rel="noopener">Printables</a>
-				<a class="link" href="{base}/cv.pdf">CV (PDF)</a>
+				{#each socialLinks as social (social.label)}
+					<a class="link" href={social.href} rel={social.external ? 'noopener' : null}>
+						<svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true">
+							<path d={social.path} />
+						</svg>
+						{social.label}
+					</a>
+				{/each}
 			</div>
 		</div>
 
-		<aside class="device" aria-label="At a glance">
-			<header class="device-head">
-				<span class="device-name mono">{profile.handle}</span>
-				{#if profile.available}
-					<span class="state-pill mono"
-						><span class="dot" aria-hidden="true"></span>Open to work</span
-					>
+		{#if termState === 'closed'}
+			<button type="button" class="term-reopen mono" onclick={() => (termState = 'open')}>
+				<span class="prompt" aria-hidden="true">$</span> reopen terminal
+			</button>
+		{:else}
+			<aside
+				class="device terminal mono"
+				class:minimized={termState === 'minimized'}
+				aria-label="At a glance"
+			>
+				<header class="term-bar">
+					<span class="term-lights">
+						<button
+							type="button"
+							class="light red"
+							aria-label="Close panel"
+							onclick={() => (termState = 'closed')}
+						></button>
+						<button
+							type="button"
+							class="light amber"
+							aria-label={termState === 'minimized' ? 'Expand panel' : 'Minimize panel'}
+							aria-pressed={termState === 'minimized'}
+							onclick={() => (termState = termState === 'minimized' ? 'open' : 'minimized')}
+						></button>
+						<button
+							type="button"
+							class="light green"
+							aria-label={termEgg ? 'Hide hidden command' : 'Run hidden command'}
+							aria-pressed={termEgg}
+							onclick={() => (termEgg = !termEgg)}
+						></button>
+					</span>
+					<span class="term-title">{profile.handle}@portfolio: ~</span>
+					{#if profile.available}
+						<span class="term-status"><span class="dot" aria-hidden="true"></span>open-to-work</span
+						>
+					{/if}
+				</header>
+				{#if termState !== 'minimized'}
+					<dl class="term-body">
+						<div class="term-entry">
+							<dt><span class="prompt" aria-hidden="true">$</span> projects --count</dt>
+							<dd><span class="num">{data.projects.length}</span> built</dd>
+						</div>
+						<div class="term-entry">
+							<dt><span class="prompt" aria-hidden="true">$</span> upstream --merged</dt>
+							<dd><span class="num">{contributions.length}</span> merged</dd>
+						</div>
+						<div class="term-entry">
+							<dt><span class="prompt" aria-hidden="true">$</span> speaks</dt>
+							<dd>{languages.map((language) => language.name).join(', ')}</dd>
+						</div>
+						{#if termEgg}
+							<div class="term-entry egg">
+								<dt><span class="prompt" aria-hidden="true">$</span> whoami</dt>
+								<dd>a developer who over-engineered this bar. hire him.</dd>
+							</div>
+						{/if}
+						<div class="term-promptline" aria-hidden="true">
+							<span class="prompt">$</span><span class="caret"></span>
+						</div>
+					</dl>
 				{/if}
-			</header>
-			<dl class="device-fields">
-				<div>
-					<dt class="mono">projects</dt>
-					<dd>{data.projects.length} built</dd>
-				</div>
-				<div>
-					<dt class="mono">upstream</dt>
-					<dd>{contributions.length} merged</dd>
-				</div>
-				<div>
-					<dt class="mono">speaks</dt>
-					<dd>{languages.map((language) => language.name).join(', ')}</dd>
-				</div>
-			</dl>
-		</aside>
+			</aside>
+		{/if}
 	</section>
 
 	<section class="shell section" id="work">
@@ -392,15 +479,11 @@
 	}
 
 	.device {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.9rem 1.75rem;
+		margin-top: 2.25rem;
 		background: var(--raised);
 		border: 1px solid var(--rule-strong);
 		border-radius: 12px;
-		margin-top: 2.25rem;
-		padding: 0.85rem 1.25rem;
+		overflow: hidden;
 		animation: settle 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) 0.55s both;
 	}
 
@@ -411,24 +494,135 @@
 		}
 	}
 
-	.device-head {
+	.terminal {
+		/* A real terminal is dark on both themes; these tokens are local so the
+		   page palette does not leak the panel to light grey in light mode. */
+		--term-bg: #16191d;
+		--term-chrome: #20252b;
+		--term-fg: #cdcbc8;
+		--term-dim: #8a8783;
+		--term-accent: #33ccff;
+		--term-rule: #2b3137;
+		font-size: var(--step--1);
+		line-height: 1.6;
+		background: var(--term-bg);
+		color: var(--term-fg);
+		border-color: var(--term-rule);
+	}
+
+	.term-bar {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
+		padding: 0.55rem 0.9rem;
+		background: var(--term-chrome);
+		border-bottom: 1px solid var(--term-rule);
 	}
 
-	.device-name {
-		color: var(--muted);
+	.term-lights {
+		display: inline-flex;
+		flex: none;
+		gap: 0.45rem;
 	}
 
-	.state-pill {
+	.light {
+		width: 0.85rem;
+		height: 0.85rem;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		cursor: pointer;
+		display: grid;
+		place-items: center;
+		font-size: 0.6rem;
+		line-height: 1;
+		color: rgba(0, 0, 0, 0.55);
+	}
+
+	.light::before {
+		opacity: 0;
+		transition: opacity 0.12s ease;
+	}
+
+	.term-lights:hover .light::before,
+	.light:focus-visible::before {
+		opacity: 1;
+	}
+
+	.light:focus-visible {
+		outline: 2px solid var(--term-accent);
+		outline-offset: 2px;
+	}
+
+	.light.red {
+		background: #ff5f56;
+	}
+
+	.light.red::before {
+		content: '\00d7';
+	}
+
+	.light.amber {
+		background: #ffbd2e;
+	}
+
+	.light.amber::before {
+		content: '\2013';
+	}
+
+	.light.green {
+		background: #27c93f;
+	}
+
+	.light.green::before {
+		content: '+';
+	}
+
+	.term-reopen {
+		--term-bg: #16191d;
+		--term-fg: #cdcbc8;
+		--term-accent: #33ccff;
+		--term-rule: #2b3137;
+		margin-top: 2.25rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.1rem;
+		font-size: var(--step--1);
+		color: var(--term-fg);
+		background: var(--term-bg);
+		border: 1px solid var(--term-rule);
+		border-radius: 10px;
+		padding: 0.6rem 1rem;
+		cursor: pointer;
+		transition:
+			border-color 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.term-reopen:hover {
+		border-color: var(--term-accent);
+		transform: translateY(-1px);
+	}
+
+	.term-reopen .prompt {
+		margin-right: 0.35rem;
+	}
+
+	.term-title {
+		flex: 1;
+		text-align: center;
+		color: var(--term-dim);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.term-status {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		color: var(--accent);
-		background: var(--accent-wash);
-		border-radius: 999px;
-		padding: 0.2rem 0.75rem;
+		flex: none;
+		color: var(--term-accent);
 	}
 
 	.dot {
@@ -441,33 +635,63 @@
 
 	@keyframes dot-ping {
 		from {
-			box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+			box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent);
 		}
 		to {
 			box-shadow: 0 0 0 0.6rem transparent;
 		}
 	}
 
-	.device-fields {
+	.term-body {
 		margin: 0;
+		padding: 0.85rem 1rem 0.95rem;
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem 1.75rem;
+		flex-direction: column;
 	}
 
-	.device-fields div {
+	.term-entry {
+		display: contents;
+	}
+
+	.term-entry dt {
+		color: var(--term-fg);
+	}
+
+	.term-entry dd {
+		margin: 0 0 0.4rem;
+		color: var(--term-dim);
+	}
+
+	.prompt {
+		color: var(--term-accent);
+		font-weight: 600;
+		margin-right: 0.15rem;
+	}
+
+	.num {
+		color: var(--term-accent);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.term-promptline {
 		display: flex;
-		align-items: baseline;
-		gap: 0.6rem;
+		align-items: center;
 	}
 
-	.device-fields dt {
-		color: var(--ink);
-		font-size: 0.875rem;
+	.caret {
+		display: inline-block;
+		width: 0.5rem;
+		height: 1.05em;
+		margin-left: 0.25rem;
+		background: var(--term-accent);
+		animation: caret-blink 1.1s steps(1) infinite;
 	}
 
-	.device-fields dd {
-		margin: 0;
+	@keyframes caret-blink {
+		50% {
+			opacity: 0;
+		}
 	}
 
 	.role {
@@ -487,11 +711,6 @@
 		max-width: 56ch;
 	}
 
-	.highlight a {
-		color: var(--accent);
-		text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
-	}
-
 	.links {
 		display: flex;
 		flex-wrap: wrap;
@@ -500,6 +719,9 @@
 	}
 
 	.link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
 		border: 1px solid var(--rule-strong);
 		border-radius: 8px;
 		padding: 0.5rem 1.1rem;
@@ -508,6 +730,19 @@
 		transition:
 			border-color 0.15s ease,
 			background-color 0.15s ease;
+	}
+
+	.link-icon {
+		width: 1.05em;
+		height: 1.05em;
+		flex: none;
+		fill: currentColor;
+		color: var(--muted);
+		transition: color 0.15s ease;
+	}
+
+	.link:hover .link-icon {
+		color: var(--accent);
 	}
 
 	.link:hover {
@@ -691,13 +926,6 @@
 	@media (min-width: 48rem) {
 		.nav {
 			display: flex;
-		}
-	}
-
-	@media (min-width: 48rem) {
-		.device-head {
-			padding-right: 1.75rem;
-			border-right: 1px solid var(--rule);
 		}
 	}
 
