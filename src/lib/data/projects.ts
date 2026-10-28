@@ -47,6 +47,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'uptime-kuma-compact-theme',
+		title: 'uptime-kuma-theme',
 		tagline: 'A compact, full-width theme for Uptime Kuma status pages.',
 		period: '2026',
 		summary:
