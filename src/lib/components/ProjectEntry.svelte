@@ -14,7 +14,6 @@
 
 	let details: HTMLDetailsElement | undefined = $state();
 	let stack: HTMLUListElement | undefined = $state();
-	let open = $state(false);
 	let hiddenTags = $state(0);
 
 	/* Tags stay on one line while the card is collapsed, so they never change
@@ -22,10 +21,6 @@
 	$effect(() => {
 		const row = stack;
 		if (!row) return;
-		if (open) {
-			hiddenTags = 0;
-			return;
-		}
 
 		const measure = () => {
 			const edge = row.getBoundingClientRect().right;
@@ -70,12 +65,21 @@
 	<p class="tagline">{project.tagline}</p>
 
 	<!-- Native details: works without JavaScript, is keyboard operable, and
-	     keeps the full text in the page for search engines and the CV. -->
-	<details class="more" bind:this={details} ontoggle={() => (open = details?.open ?? false)}>
+	     keeps the full text in the page for search engines. Open, it covers
+	     the card rather than growing it, so no other card moves. -->
+	<details class="more" bind:this={details}>
 		<summary class="mono">
 			<span class="when-closed">Read more</span><span class="when-open">Show less</span>
 		</summary>
-		<p class="summary">{project.summary}</p>
+		<div class="overlay">
+			<p class="overlay-name" aria-hidden="true">{project.title ?? project.repo}</p>
+			<p class="summary">{project.summary}</p>
+			<ul class="overlay-tags" aria-hidden="true">
+				{#each project.exposes as tool (tool)}
+					<li>{tool}</li>
+				{/each}
+			</ul>
+		</div>
 	</details>
 
 	<div class="tags">
@@ -117,7 +121,8 @@
 		background: var(--raised);
 		border: 1px solid var(--rule);
 		border-radius: 10px;
-		padding: clamp(1.25rem, 3vw, 1.75rem);
+		--pad: clamp(1.25rem, 3vw, 1.75rem);
+		padding: var(--pad);
 		transition:
 			border-color 0.15s ease,
 			transform 0.15s ease;
@@ -132,8 +137,8 @@
 		height: 3px;
 		background: var(--lang);
 		border-radius: 10px 10px 0 0;
-		/* Above the screenshot, which would otherwise paint over it. */
-		z-index: 1;
+		/* Above the screenshot and the Read more overlay. */
+		z-index: 2;
 	}
 
 	.card:hover {
@@ -239,22 +244,58 @@
 		min-height: 3lh;
 	}
 
+	/* The toggle leaves the flow when it moves to the corner; keep its line
+	   so the open card's content, and so its row, does not get shorter. */
 	.more {
-		/* Lets the block size transition to and from auto, where supported.
-		   Elsewhere the text simply appears. */
-		interpolate-size: allow-keywords;
+		min-height: 1.65em;
+		min-height: 1lh;
 	}
 
-	.more::details-content {
-		block-size: 0;
-		overflow: clip;
-		transition:
-			block-size 0.3s ease,
-			content-visibility 0.3s allow-discrete;
+	/* The open card shows its full text over itself, image included, and
+	   keeps its size. The toggle moves to the bottom corner, above it. */
+	.overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		padding: var(--pad) var(--pad) calc(var(--pad) + 2rem);
+		background: var(--raised);
+		border-radius: 10px;
+		overflow-y: auto;
+		animation: overlay-in 0.2s ease;
 	}
 
-	.more[open]::details-content {
-		block-size: auto;
+	@keyframes overlay-in {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+	}
+
+	.overlay-name {
+		font-family: var(--display);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		font-size: var(--step-1);
+		line-height: 1.1;
+	}
+
+	.overlay-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.more[open] summary {
+		position: absolute;
+		left: var(--pad);
+		bottom: var(--pad);
+		z-index: 3;
 	}
 
 	.more summary {
@@ -304,7 +345,8 @@
 
 	.summary {
 		color: var(--ink);
-		padding-top: 0.6rem;
+		font-size: 0.94em;
+		line-height: 1.6;
 	}
 
 	.tags {
@@ -313,8 +355,8 @@
 		gap: 0.4rem;
 	}
 
-	/* One line while collapsed, so the tags never change the card's height.
-	   Opening Read more wraps them, since the card is growing anyway. */
+	/* One line, so the tags never change the card's height. The Read more
+	   overlay lists them all. */
 	.stack {
 		display: flex;
 		flex: 1;
@@ -332,11 +374,8 @@
 		visibility: hidden;
 	}
 
-	.card:has(.more[open]) .stack {
-		flex-wrap: wrap;
-	}
-
-	.stack li {
+	.stack li,
+	.overlay-tags li {
 		flex: none;
 		white-space: nowrap;
 		font-family: var(--mono);
