@@ -2,7 +2,7 @@ import type { CuratedProject } from '$lib/types/project';
 
 /**
  * The projects, roughly newest activity first. Each summary states the problem, what
- * was built, and what came of it — reviewers skim, so the point goes first.
+ * was built, and what came of it. Reviewers skim, so the point goes first.
  *
  * Live language, stars, last-push dates and demo links are merged in at build
  * time by src/routes/+page.server.ts.
@@ -18,9 +18,9 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'hyprland-dots',
-		period: '2025—2026',
+		period: '2025 - 2026',
 		summary:
-			'Most Hyprland setups stitch together other people’s widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead — bar, notifications, launcher, on-screen displays — so it behaves as one piece. It is what I run every day.',
+			"Most Hyprland setups stitch together other people's widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead (bar, notifications, launcher and on-screen displays), so it all looks and behaves the same. It's what I run every day.",
 		exposes: ['QML', 'Quickshell', 'Hyprland', 'Wayland'],
 		shot: { src: 'shots/hyprland-dots.webp', width: 1200, height: 750 }
 	},
@@ -36,7 +36,7 @@ export const projects: CuratedProject[] = [
 		repo: 'tailboard',
 		period: '2026',
 		summary:
-			'A dozen self-hosted services means a dozen bookmarks and no idea which one is down. Tailboard puts them all on one page with their status, so the homelab has a front door instead of a folder of links.',
+			"A dozen self-hosted services means a dozen bookmarks and no idea which one is down. Tailboard puts them all on one page with their status, so I can see what's running and what's down in one place.",
 		exposes: ['self-hosted', 'homelab', 'dashboard'],
 		shot: { src: 'shots/tailboard.webp', width: 900, height: 562 }
 	},
@@ -44,7 +44,7 @@ export const projects: CuratedProject[] = [
 		repo: 'uptime-kuma-compact-theme',
 		period: '2026',
 		summary:
-			'Uptime Kuma’s status page wastes a wall-mounted screen: wide gaps, uptime numbers overlapping names, ragged heartbeat bars. This is one CSS file for the Custom CSS field that packs monitors into a full-width grid, with status-coloured uptime pills and bottom-aligned bars.',
+			"Uptime Kuma's status page wastes a wall-mounted screen: wide gaps, uptime numbers overlapping names, ragged heartbeat bars. This is one CSS file for the Custom CSS field that packs monitors into a full-width grid, with status-coloured uptime pills and bottom-aligned bars.",
 		exposes: ['CSS', 'Uptime Kuma', 'dark theme'],
 		shot: {
 			src: 'shots/uptime-kuma-compact-theme.webp',
@@ -55,7 +55,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'sonic-siphon',
-		period: '2025—2026',
+		period: '2025 - 2026',
 		summary:
 			'Every YouTube-to-MP3 site is an ad farm that wants your links on its server. This is one Go binary you run yourself: paste a playlist, get the files back, nothing leaves your machine.',
 		exposes: ['Go', 'single binary', 'self-hosted'],
@@ -73,14 +73,14 @@ export const projects: CuratedProject[] = [
 		repo: 'ha-elering-ee',
 		period: '2026',
 		summary:
-			'Estonian electricity prices swing hour to hour, but Home Assistant could not see them. This pulls Elering’s hourly rates into a sensor, so an automation can hold the dishwasher until the cheap window.',
+			"Estonian electricity prices swing hour to hour, but Home Assistant couldn't see them. This pulls Elering's hourly rates into a sensor, so an automation can hold the dishwasher until the cheap window.",
 		exposes: ['Python', 'Home Assistant', 'Elering API']
 	},
 	{
 		repo: 'esc2pipe',
-		period: '2023—2024',
+		period: '2023 - 2024',
 		summary:
-			'Some keyboard layouts hide the pipe character behind a combination a laptop cannot produce. This binds it to Escape in fish, so a key nobody uses at a prompt types the one you need constantly.',
+			"Some keyboard layouts hide the pipe character behind a key combination a laptop can't produce. This plugin for fish makes Escape type a pipe instead.",
 		exposes: ['fish', 'Fisher', 'shell']
 	}
 ];

@@ -1,5 +1,5 @@
 /**
- * Brand colours for tools Simple Icons does not carry — it has dropped most
+ * Brand colours for tools Simple Icons does not carry. It has dropped most
  * Microsoft and Oracle marks on trademark grounds. These hexes are the ones
  * already used on the GitHub profile README's badges, so the two stay in step.
  * Tools listed here render a letter mark instead of a logo.

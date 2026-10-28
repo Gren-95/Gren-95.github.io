@@ -7,7 +7,7 @@
    files ride the connection the page already has.
 
    Vietnamese subsets are dropped. latin covers everything the page writes today
-   — ä, ü, em dash, curly quote — and latin-ext is declared for Estonian š and ž
+   (ä, ü, straight quotes) and latin-ext is declared for Estonian š and ž
    but, thanks to unicode-range, is only fetched if a glyph actually needs it.
 --------------------------------------------------------------------------- */
 

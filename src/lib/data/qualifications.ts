@@ -13,7 +13,7 @@ export interface Post {
 
 export const work: Post[] = [
 	{
-		period: 'Apr 2026 — present',
+		period: 'Apr 2026 - present',
 		title: 'Junior Developer and IT Operations Specialist',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
@@ -21,7 +21,7 @@ export const work: Post[] = [
 		detail: 'Building web applications and keeping the IT infrastructure behind them running.'
 	},
 	{
-		period: 'Sep 2024 — Mar 2026',
+		period: 'Sep 2024 - Mar 2026',
 		title: 'Web Developer (internship)',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
@@ -30,7 +30,7 @@ export const work: Post[] = [
 			'The third internship at the same company and the first on the development side, which turned into the developer post above.'
 	},
 	{
-		period: 'Feb 2023 — Aug 2024',
+		period: 'Feb 2023 - Aug 2024',
 		title: 'IT Support Technician',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
@@ -41,7 +41,7 @@ export const work: Post[] = [
 
 export const education: Post[] = [
 	{
-		period: '2026 —',
+		period: '2026 - present',
 		title: 'Arukad süsteemid ja rakendusinfotehnoloogia',
 		place: 'Tallinna Tehnikaülikool',
 		logo: { src: 'logos/taltech.png', width: 171, height: 96 },
@@ -50,22 +50,22 @@ export const education: Post[] = [
 			'Professional higher education in smart systems and applied information technology. Three and a half years at the Kohtla-Järve campus, taught in Estonian. Started August 2026, alongside the job.'
 	},
 	{
-		period: '2024 — 2026',
+		period: '2024 - 2026',
 		title: 'Junior Developer, EQF level 4',
 		place: 'Viljandi Kutsehariduskeskus',
 		logo: { src: 'logos/vikk.png', width: 349, height: 96 },
 		placeUrl: 'https://vikk.ee/',
 		detail:
-			'AI-driven development, and the programming groundwork that makes it work: object orientation and the basics you need to judge whether generated code is any good. Less about producing code than directing the tools and catching what they get wrong.'
+			'AI-driven development, and the programming groundwork that makes it work: object orientation and the basics you need to judge whether generated code is any good. Most of it was about directing the tools and catching their mistakes.'
 	},
 	{
-		period: '2021 — 2024',
+		period: '2021 - 2024',
 		title: 'Junior IT Systems Specialist, EQF level 4',
 		place: 'Rakvere Ametikool',
 		logo: { src: 'logos/rakvere.png', width: 137, height: 96 },
 		placeUrl: 'https://rak.ee/',
 		detail:
-			'Networks and hardware with hands on the kit: CAT 5e through CAT 7 terminated by hand, punched down to 110 blocks and keystone panels, and a rack of Cisco switches and routers cabled to be used afterwards rather than just graded. Also where I learned to coax a configuration page out of an access point too old for a modern browser to render one.'
+			'Networks and hardware with hands on the kit: CAT 5e through CAT 7 terminated by hand, punched down to 110 blocks and keystone panels, and a rack of Cisco switches and routers cabled properly enough to keep using after it was graded. Also where I learned to coax a configuration page out of an access point too old for a modern browser to render one.'
 	}
 ];
 

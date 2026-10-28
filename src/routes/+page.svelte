@@ -57,11 +57,11 @@
 </script>
 
 <svelte:head>
-	<title>{profile.name} — {profile.role}, {profile.location}</title>
+	<title>{profile.name} | {profile.role}, {profile.location}</title>
 	<meta name="description" content="{profile.role} at {profile.employer}. {profile.intro}" />
 	<link rel="canonical" href={profile.site} />
 
-	<meta property="og:title" content="{profile.name} — {profile.role}" />
+	<meta property="og:title" content="{profile.name} | {profile.role}" />
 	<meta property="og:description" content={profile.intro} />
 	<meta property="og:type" content="profile" />
 	<meta property="og:url" content={profile.site} />
@@ -73,7 +73,7 @@
 	<meta property="og:site_name" content={profile.name} />
 
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="{profile.name} — {profile.role}" />
+	<meta name="twitter:title" content="{profile.name} | {profile.role}" />
 	<meta name="twitter:description" content={profile.intro} />
 	<meta name="twitter:image" content="{profile.site}og.png" />
 
@@ -119,9 +119,9 @@
 			<p class="intro">{profile.intro}</p>
 
 			<p class="highlight">
-				Most recently I fixed a blocking call on Home Assistant’s event loop in the
+				Most recently I fixed a blocking call on Home Assistant's event loop in the
 				<a href={contributions[0].url} rel="noopener">X-Sense integration</a>, one of
-				{contributionCount} contributions merged by maintainers of projects I do not own.
+				{contributionCount} contributions merged by maintainers of projects I don't own.
 			</p>
 
 			<div class="links">
@@ -162,7 +162,7 @@
 	<section class="shell section" id="work">
 		<div class="section-head">
 			<h2>Work</h2>
-			<p class="section-note">One employer, two roles.</p>
+			<p class="section-note">One employer, three roles.</p>
 		</div>
 		<PostList posts={work} />
 	</section>
@@ -171,7 +171,7 @@
 		<div class="section-head">
 			<h2>Projects</h2>
 			<p class="section-note">
-				{projectCount} things I have built, newest first. Language, stars, dates and live links come from
+				{projectCount} things I've built, newest first. Language, stars, dates and live links come from
 				the GitHub API when the site builds.
 			</p>
 		</div>
@@ -186,7 +186,7 @@
 	<section class="shell section" id="upstream">
 		<div class="section-head">
 			<h2>Open source</h2>
-			<p class="section-note">Work reviewed and merged by maintainers of projects I do not own.</p>
+			<p class="section-note">Work reviewed and merged by maintainers of projects I don't own.</p>
 		</div>
 		<ol class="contributions">
 			{#each contributions as contribution, index (contribution.url)}
@@ -226,7 +226,7 @@
 	<section class="shell section" id="toolkit">
 		<div class="section-head">
 			<h2>Toolkit</h2>
-			<p class="section-note">What I have actually put into production or into a homelab.</p>
+			<p class="section-note">What I've actually used in production or in my homelab.</p>
 		</div>
 		<div class="tools">
 			{#each data.toolkit as group, index (group.heading)}
@@ -267,7 +267,7 @@
 				<h3 class="tool-heading">Spoken languages</h3>
 				<ul class="spoken">
 					{#each languages as language (language.name)}
-						<li><strong>{language.name}</strong> — {language.level}</li>
+						<li><strong>{language.name}</strong>: {language.level}</li>
 					{/each}
 				</ul>
 			</div>

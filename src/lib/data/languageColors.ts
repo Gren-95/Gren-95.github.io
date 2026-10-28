@@ -3,10 +3,10 @@
  * in these repositories. Taken from github-linguist by way of ozh/github-colors.
  *
  * These are deliberately not re-stepped to pass a palette validator: the whole
- * point is that JavaScript yellow and Go cyan are recognisable. Because several
- * fail contrast against one surface or the other — JavaScript at 1.32:1 on the
- * light theme, PowerShell at 1.15:1 on the dark — every mark carries a written
- * label and an outline, so colour never has to be read on its own.
+ * point is that JavaScript yellow and Go cyan are recognisable. Several fail
+ * contrast against one surface or the other (JavaScript at 1.32:1 on the light
+ * theme, PowerShell at 1.15:1 on the dark), so every mark carries a written
+ * label and an outline and colour never has to be read on its own.
  */
 export const languageColors: Record<string, string> = {
 	CSS: '#663399',
