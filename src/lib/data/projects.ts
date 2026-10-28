@@ -74,6 +74,15 @@ export const projects: CuratedProject[] = [
 		shot: { src: 'shots/tailboard.webp', width: 900, height: 562 }
 	},
 	{
+		repo: 'tailboard-companion',
+		tagline: 'Puts my Tailboard on every new tab, in a popup, and on right-click.',
+		period: '2026',
+		summary:
+			"The browser-side half of Tailboard. It shows the dashboard on every new tab, adds a toolbar popup that searches my links, an address-bar keyword, and a right-click launcher grouped by group. It opens each link's reachable address, so a service stays one click away even when its main URL is down.",
+		exposes: ['browser extension', 'Manifest V3', 'Firefox', 'Chrome'],
+		shot: { src: 'shots/tailboard-companion.webp', width: 900, height: 562 }
+	},
+	{
 		repo: 'uptime-kuma-compact-theme',
 		title: 'uptime-kuma-theme',
 		tagline: 'A compact, full-width theme for Uptime Kuma status pages.',
