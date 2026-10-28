@@ -4,7 +4,9 @@ export interface CuratedProject {
 	repo: string;
 	/** Year or year range the work belongs to, used as the left rail marker. */
 	period: string;
-	/** One sentence, in plain terms, about what the thing does for its user. */
+	/** One short line, always visible on the card. */
+	tagline: string;
+	/** The longer story, shown when the card is expanded and printed on the CV. */
 	summary: string;
 	/** What the project offers, borrowing the vocabulary of a device definition. */
 	exposes: string[];
