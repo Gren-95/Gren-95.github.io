@@ -4,6 +4,7 @@ import { projects } from '$lib/data/projects';
 import { toolkit, aiTools } from '$lib/data/qualifications';
 import { resolveTool, resolveToolkit } from '$lib/resolveToolIcons';
 import { summariseLanguages } from '$lib/languageMix';
+import { fetchActivity } from '$lib/activity';
 import type { PageServerLoad } from './$types';
 
 const API = 'https://api.github.com/users/Gren-95/repos?per_page=100&type=owner';
@@ -34,7 +35,11 @@ export const load: PageServerLoad = async ({ fetch }) => {
 
 	const repos = (await response.json()) as GitHubRepo[];
 
+	// Optional: without it the Activity section is left out, not the build.
+	const activity = await fetchActivity(fetch, token);
+
 	return {
+		activity,
 		projects: mergeProjects(projects, repos),
 		...summariseLanguages(repos),
 		// Logos and brand colours are resolved here so Simple Icons stays a

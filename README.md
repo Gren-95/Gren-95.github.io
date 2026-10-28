@@ -78,6 +78,10 @@ Everything worth changing lives in `src/lib/data/`:
 | `contributions.ts`  | work sent to projects other people maintain                 |
 | `qualifications.ts` | skill groups, schooling, spoken languages                   |
 
+The Activity section needs no editing: `src/lib/activity.ts` fetches the GitHub
+contribution calendar at build time, and a daily scheduled build keeps it
+current. Without a token (a local build) the section is left out.
+
 Adding a project means adding an entry to `projects.ts` whose `repo` matches a
 public repository name. If it doesn't match, the build fails on purpose rather
 than quietly dropping the entry.
