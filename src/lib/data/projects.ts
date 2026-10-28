@@ -84,7 +84,13 @@ export const projects: CuratedProject[] = [
 		period: '2026',
 		summary:
 			"Estonian electricity prices swing hour to hour, but Home Assistant couldn't see them. This pulls Elering's hourly rates into a sensor, so an automation can hold the dishwasher until the cheap window.",
-		exposes: ['Python', 'Home Assistant', 'Elering API']
+		exposes: ['Python', 'Home Assistant', 'Elering API'],
+		shot: {
+			src: 'shots/ha-elering-ee.webp',
+			width: 1200,
+			height: 750,
+			alt: "Home Assistant dashboard with the current price, today's statistics and an hourly price chart"
+		}
 	},
 	{
 		repo: 'esc2pipe',
@@ -92,6 +98,12 @@ export const projects: CuratedProject[] = [
 		period: '2023 - 2024',
 		summary:
 			"Some keyboard layouts hide the pipe character behind a key combination a laptop can't produce. This plugin for fish makes Escape type a pipe instead.",
-		exposes: ['fish', 'Fisher', 'shell']
+		exposes: ['fish', 'Fisher', 'shell'],
+		shot: {
+			src: 'shots/esc2pipe.webp',
+			width: 1200,
+			height: 750,
+			alt: 'A fish session where every pipe in the commands was typed by pressing Escape'
+		}
 	}
 ];
