@@ -13,7 +13,7 @@ export interface Post {
 
 export const work: Post[] = [
 	{
-		period: 'Feb 2024 — present',
+		period: 'Apr 2026 — present',
 		title: 'Junior Web Developer',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
@@ -21,12 +21,21 @@ export const work: Post[] = [
 		detail: 'Building web applications and keeping the IT infrastructure behind them running.'
 	},
 	{
-		period: '2022 — Feb 2024',
+		period: 'Sep 2024 — Mar 2026',
+		title: 'Web Developer (internship)',
+		place: 'JELD-WEN Eesti AS',
+		placeUrl: 'https://www.swedoor.ee/',
+		logo: { src: 'logos/jeldwen.svg', width: 152, height: 43 },
+		detail:
+			'The third internship at the same company and the first on the development side, which turned into the developer post above.'
+	},
+	{
+		period: 'Feb 2023 — Aug 2024',
 		title: 'IT Support Technician',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
 		logo: { src: 'logos/jeldwen.svg', width: 152, height: 43 },
-		detail: 'Three internships at the same company, which turned into the developer post above.'
+		detail: 'Two internships at the same company, on the IT support side.'
 	}
 ];
 
