@@ -1,0 +1,110 @@
+<!doctype html>
+<!--
+	Social preview template. Screenshot at 1200x630 into static/og.png:
+	the fonts load from ../static/fonts, so open this file from scripts/.
+-->
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			@font-face {
+				font-family: 'Archivo';
+				font-weight: 400 700;
+				src: url('../static/fonts/archivo-latin.woff2') format('woff2');
+			}
+			@font-face {
+				font-family: 'Bricolage Grotesque';
+				font-weight: 500 700;
+				src: url('../static/fonts/bricolage-latin.woff2') format('woff2');
+			}
+			@font-face {
+				font-family: 'Spline Sans Mono';
+				font-weight: 400 500;
+				src: url('../static/fonts/spline-mono-latin.woff2') format('woff2');
+			}
+
+			* {
+				margin: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				width: 1200px;
+				height: 630px;
+				overflow: hidden;
+				background: #fafaf9;
+				color: #1c1917;
+				border-top: 10px solid #0e7490;
+				padding: 0 96px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				font-family: 'Archivo', sans-serif;
+			}
+
+			.pill {
+				align-self: flex-start;
+				padding: 6px 20px;
+				border-radius: 999px;
+				background: #ecfeff;
+				color: #0e7490;
+				font:
+					400 22px 'Spline Sans Mono',
+					monospace;
+			}
+
+			h1 {
+				margin-top: 28px;
+				font:
+					700 96px/1.05 'Bricolage Grotesque',
+					sans-serif;
+				letter-spacing: -0.035em;
+			}
+
+			.role {
+				margin-top: 30px;
+				font-size: 36px;
+				line-height: 1.4;
+			}
+
+			.role strong {
+				font-weight: 500;
+			}
+
+			ul {
+				margin-top: 48px;
+				padding: 0;
+				list-style: none;
+				display: flex;
+				gap: 30px;
+				color: #57534e;
+				font:
+					400 22px 'Spline Sans Mono',
+					monospace;
+			}
+
+			li::before {
+				content: '';
+				display: inline-block;
+				width: 8px;
+				height: 8px;
+				margin: 0 12px 3px 0;
+				border-radius: 50%;
+				background: #0e7490;
+			}
+		</style>
+	</head>
+	<body>
+		<span class="pill">Open to work</span>
+		<h1>Efe Marko Güldere</h1>
+		<p class="role">
+			<strong>Junior Developer and IT Operations Specialist</strong><br />
+			at JELD-WEN Eesti AS · Rakvere, Estonia
+		</p>
+		<ul>
+			<li>Web applications</li>
+			<li>Self-hosted infrastructure</li>
+			<li>Merged upstream</li>
+		</ul>
+	</body>
+</html>

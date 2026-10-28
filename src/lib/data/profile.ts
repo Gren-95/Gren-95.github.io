@@ -5,7 +5,7 @@
 export const profile = {
 	name: 'Efe Marko Güldere',
 	handle: 'Gren95',
-	role: 'Junior Web Developer',
+	role: 'Junior Developer and IT Operations Specialist',
 	employer: 'JELD-WEN Eesti AS',
 	employerUrl: 'https://www.swedoor.ee/',
 	location: 'Rakvere, Estonia',
