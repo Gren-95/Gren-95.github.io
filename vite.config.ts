@@ -10,7 +10,9 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			// fallback gives GitHub Pages a 404.html: an unknown URL loads it, the
+			// client router resolves the miss, and +error.svelte renders the 404.
+			adapter: adapter({ fallback: '404.html' })
 		})
 	],
 	test: {
