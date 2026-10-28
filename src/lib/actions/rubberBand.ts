@@ -37,12 +37,8 @@ export function isSettled(state: BandState): boolean {
  * Drags an element with the scroll like a rubber band: down while scrolling
  * down, up while scrolling up, and back to rest when the scrolling stops. The
  * element stretches away from the edge it is pulled from.
- *
- * Skipped under `prefers-reduced-motion`, since the whole effect is motion.
  */
 export function rubberBand(node: HTMLElement | SVGElement) {
-	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return {};
-
 	let state: BandState = { offset: 0, velocity: 0 };
 	let lastScroll = window.scrollY;
 	let frame = 0;

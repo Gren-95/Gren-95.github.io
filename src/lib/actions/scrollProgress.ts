@@ -6,10 +6,6 @@
  * This is deliberately JavaScript rather than `animation-timeline: scroll()`:
  * Firefox 154 still reports `CSS.supports('animation-timeline', 'scroll(root
  * block)') === false`, so the pure-CSS version renders nothing at all there.
- *
- * The bar tracks the scroll position one-to-one rather than animating on its
- * own, so it is kept under `prefers-reduced-motion` — it is an indicator, not
- * a flourish.
  */
 export function scrollProgress(_node: HTMLElement) {
 	let frame = 0;
