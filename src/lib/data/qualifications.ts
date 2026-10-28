@@ -81,26 +81,44 @@ export interface ToolGroup {
 export const toolkit: ToolGroup[] = [
 	{
 		heading: 'Languages',
-		tools: ['Go', 'Python', 'TypeScript', 'JavaScript', 'PHP', 'Java', 'Shell', 'PowerShell']
+		tools: [
+			'Go',
+			'Python',
+			'TypeScript',
+			'JavaScript',
+			'Rust',
+			'PHP',
+			'Java',
+			'Shell',
+			'PowerShell',
+			'QML'
+		]
 	},
 	{
 		heading: 'Web and runtime',
 		tools: [
 			'React',
+			'Next.js',
+			'Svelte',
 			'Node.js',
 			'Express',
 			'Bun',
+			'Gin',
 			'Vite',
 			'Tailwind CSS',
 			'jQuery',
-			'Playwright',
 			'Nginx',
+			'Caddy',
 			'Apache'
 		]
 	},
 	{
 		heading: 'Data',
-		tools: ['MySQL', 'MariaDB', 'SQLite', 'Prisma', 'phpMyAdmin']
+		tools: ['MySQL', 'MariaDB', 'PostgreSQL', 'SQLite', 'Prisma', 'phpMyAdmin']
+	},
+	{
+		heading: 'Testing',
+		tools: ['Playwright', 'Vitest', 'Jest', 'pytest']
 	},
 	{
 		heading: 'Systems and networking',
@@ -122,15 +140,30 @@ export const toolkit: ToolGroup[] = [
 		heading: 'Infrastructure and automation',
 		tools: [
 			'Docker',
+			'Podman',
 			'Proxmox',
 			'Portainer',
 			'Ansible',
 			'Terraform',
 			'GitHub Actions',
+			'Prometheus',
 			'TrueNAS',
 			'DigitalOcean',
-			'Home Assistant',
 			'ServiceNow'
+		]
+	},
+	{
+		heading: 'Self-hosted and smart home',
+		tools: [
+			'Home Assistant',
+			'MQTT',
+			'Zigbee2MQTT',
+			'Node-RED',
+			'Uptime Kuma',
+			'Gitea',
+			'Jellyfin',
+			'Immich',
+			'AdGuard Home'
 		]
 	}
 ];
