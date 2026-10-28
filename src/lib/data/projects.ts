@@ -61,13 +61,18 @@ export const projects: CuratedProject[] = [
 		}
 	},
 	{
-		repo: 'sonic-siphon',
-		tagline: 'A self-hosted YouTube to MP3 downloader in a single Go binary.',
-		period: '2025 - 2026',
+		repo: 'gcode-viewer',
+		tagline: 'A fast 3D viewer for G-code toolpaths on Linux.',
+		period: '2026',
 		summary:
-			'Every YouTube-to-MP3 site is an ad farm that wants your links on its server. This is one Go binary you run yourself: paste a playlist, get the files back, nothing leaves your machine.',
-		exposes: ['Go', 'single binary', 'self-hosted'],
-		shot: { src: 'shots/sonic-siphon.webp', width: 1200, height: 750 }
+			'Checking a print before sending it meant opening a whole slicer just to look at the toolpath. Gcode Viewer opens a .gcode file on its own: orbit the model, scrub through layers, colour it by speed, feature or filament, and read off print time and filament use. It installs as the default app for .gcode files, with thumbnails in the file manager.',
+		exposes: ['Rust', 'egui', 'wgpu', 'WGSL', 'Linux'],
+		shot: {
+			src: 'shots/gcode-viewer.webp',
+			width: 1200,
+			height: 727,
+			alt: 'Gcode Viewer showing a multi-colour print coloured by filament, with shadows and collapsible sidebar sections'
+		}
 	},
 	{
 		repo: 'spawnpoint',
