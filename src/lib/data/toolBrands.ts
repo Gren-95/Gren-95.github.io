@@ -16,7 +16,9 @@ export const brandFallbacks: Record<string, string> = {
 
 /** Where the tool's display name differs from the Simple Icons title. */
 export const iconAliases: Record<string, string> = {
+	'AdGuard Home': 'AdGuard',
 	'Cisco networking': 'Cisco',
+	QML: 'Qt',
 	Shell: 'GNU Bash',
 	macOS: 'Apple'
 };
