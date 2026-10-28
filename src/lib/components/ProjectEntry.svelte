@@ -124,20 +124,6 @@
 		transition: color 0.2s ease;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.pulse {
-			animation: none;
-		}
-
-		.card {
-			transition: none;
-		}
-
-		.card:hover {
-			transform: none;
-		}
-	}
-
 	.shot {
 		display: block;
 		width: calc(100% + 2 * clamp(1.25rem, 3vw, 1.75rem));

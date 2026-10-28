@@ -156,19 +156,4 @@
 			opacity: 0;
 		}
 	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.packet,
-		.ring {
-			animation: none;
-		}
-
-		.packet {
-			display: none;
-		}
-
-		.ring {
-			opacity: 0;
-		}
-	}
 </style>

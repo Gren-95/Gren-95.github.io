@@ -80,14 +80,4 @@
 		color: var(--muted);
 		white-space: nowrap;
 	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.model {
-			transition: none;
-		}
-
-		.model:hover {
-			transform: none;
-		}
-	}
 </style>

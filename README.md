@@ -54,7 +54,7 @@ src/
 ├── app.css                    design tokens and base styles
 ├── app.html                   document shell, fonts, pre-paint theme
 ├── lib/
-│   ├── actions/reveal.ts      scroll-in reveal, skipped under reduced motion
+│   ├── actions/reveal.ts      scroll-in reveal
 │   ├── components/            ProjectEntry, ThemeToggle
 │   ├── data/                  curated content: projects, contributions,
 │   │                          qualifications, profile
@@ -99,8 +99,9 @@ ship; the choice is stored per browser and settled before first paint.
 
 ### Motion
 
-Every effect is a progressive enhancement, and all of them are dropped under
-`prefers-reduced-motion: reduce`.
+Every effect is a progressive enhancement. The site plays them regardless of
+`prefers-reduced-motion`: the motion is part of the design, so it is not
+switched off by the operating system setting.
 
 | Effect                                                  | Built with                           | Without support  |
 | ------------------------------------------------------- | ------------------------------------ | ---------------- |

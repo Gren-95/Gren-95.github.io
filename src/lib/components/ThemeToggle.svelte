@@ -19,14 +19,12 @@
 
 	/**
 	 * Swaps the theme behind a circular wipe that grows from the button itself.
-	 * Browsers without the View Transitions API, and anyone who asked for
-	 * reduced motion, get the same instant swap without the flourish.
+	 * Browsers without the View Transitions API get the same instant swap
+	 * without the flourish.
 	 */
 	function toggle(event: MouseEvent) {
 		const next: Theme = theme === 'light' ? 'dark' : 'light';
-		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-		if (reduced || !document.startViewTransition) {
+		if (!document.startViewTransition) {
 			apply(next);
 			return;
 		}
@@ -159,17 +157,5 @@
 	.toggle[data-theme='dark'] .rays {
 		opacity: 0;
 		transform: rotate(-45deg) scale(0.4);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.toggle::before {
-			display: none;
-		}
-
-		.disc,
-		.bite,
-		.rays {
-			transition: none;
-		}
 	}
 </style>

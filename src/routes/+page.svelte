@@ -669,18 +669,6 @@
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.letter,
-		.device,
-		.dot {
-			animation: none;
-		}
-
-		.chip:hover {
-			transform: none;
-		}
-	}
-
 	@media (max-width: 44rem) {
 		.contribution {
 			grid-template-columns: 1fr;

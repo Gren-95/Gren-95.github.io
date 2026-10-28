@@ -4,8 +4,6 @@
  * everything.
  */
 export function reveal(node: HTMLElement, delay = 0) {
-	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return {};
-
 	node.style.opacity = '0';
 	node.style.transform = 'translateY(22px)';
 	node.style.transition = `opacity .7s ease ${delay}ms, transform .7s cubic-bezier(.2,.7,.3,1) ${delay}ms`;
