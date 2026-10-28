@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-	<title>{profile.name} — CV</title>
+	<title>{profile.name} | CV</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -39,7 +39,7 @@
 			<div class="row">
 				<span class="when">{post.period}</span>
 				<div>
-					<h3>{post.title} — {post.place}</h3>
+					<h3>{post.title}, {post.place}</h3>
 					<p>{post.detail}</p>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 			<div class="row">
 				<span class="when">{post.period}</span>
 				<div>
-					<h3>{post.title} — {post.place}</h3>
+					<h3>{post.title}, {post.place}</h3>
 					<p>{post.detail}</p>
 				</div>
 			</div>
@@ -76,7 +76,7 @@
 		<h2>Projects</h2>
 		<ul class="plain">
 			{#each projects as p (p.repo)}
-				<li><strong>{p.repo}</strong> — {p.summary}</li>
+				<li><strong>{p.repo}</strong>: {p.summary}</li>
 			{/each}
 		</ul>
 	</section>
@@ -192,7 +192,7 @@
 		}
 
 		/* The page-margin area is painted from the canvas, which follows the
-		   root's colour-scheme — so overriding body alone left a white sheet
+		   root's colour-scheme, so overriding body alone left a white sheet
 		   floating in a black A4 margin. */
 		:global(html),
 		:global(body) {

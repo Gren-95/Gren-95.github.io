@@ -62,7 +62,7 @@ function mix(hex: string, towards: string, amount: number): string {
 
 /**
  * A few brand colours sit at a mid tone where neither black nor white quite
- * clears AA at chip size — phpMyAdmin's periwinkle, for one. Those get walked
+ * clears AA at chip size (phpMyAdmin's periwinkle, for one). Those get walked
  * a few percent further from their text colour until the label is readable;
  * every other brand is returned untouched.
  */

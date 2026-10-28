@@ -4,7 +4,7 @@
    Palette: Tailwind Stone with his own cyan.
    Stone is the palette he picked for hyprland-dots; #33ccff is the accent from
    his GitHub profile banner. On the light ground the cyan is darkened to
-   cyan-700 so it clears AA — measured ratios are noted against each token.
+   cyan-700 so it clears AA. Measured ratios are noted against each token.
 --------------------------------------------------------------------------- */
 :root {
 	--paper: #fafaf9;
@@ -179,7 +179,7 @@ a:hover {
    A tiled texture rather than an SVG feTurbulence filter: filter-generated
    noise over a full-viewport area is the part that costs paint performance on
    low-end devices. The tile is mid-grey with random alpha, so one asset serves
-   both themes — it darkens the light ground and lightens the dark one.
+   both themes: it darkens the light ground and lightens the dark one.
 
    Only transform animates, in steps, which is what gives grain its flicker
    without repainting anything.

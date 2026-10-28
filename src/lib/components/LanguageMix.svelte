@@ -10,7 +10,7 @@
 <!--
 	Sorted bars rather than one stacked bar: with fourteen languages the smallest
 	would be a two-percent sliver. Every row is named and counted, so the colour
-	reinforces identity without ever having to carry it — which is what the
+	reinforces identity without ever having to carry it, which is what the
 	linguist palette needs, since several of its hues fail contrast against one
 	surface or the other.
 -->

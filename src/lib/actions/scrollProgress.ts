@@ -1,6 +1,6 @@
 /**
  * Publishes how far the page has been scrolled, 0 to 1, as a CSS custom
- * property on the document root, so any element can read it — the reading
+ * property on the document root, so any element can read it. The reading
  * progress bar and the section backdrop both do.
  *
  * This is deliberately JavaScript rather than `animation-timeline: scroll()`:
