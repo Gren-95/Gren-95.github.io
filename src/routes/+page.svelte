@@ -2,6 +2,7 @@
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
 	import LanguageMix from '$lib/components/LanguageMix.svelte';
 	import ModelGrid from '$lib/components/ModelGrid.svelte';
+	import ActivityGraph from '$lib/components/ActivityGraph.svelte';
 	import PostList from '$lib/components/PostList.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -60,14 +61,15 @@
 	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
 	const letters = profile.name.split('').map((letter) => (letter === ' ' ? '\u00A0' : letter));
 
-	const sections = [
+	const sections = $derived([
 		{ id: 'work', label: 'Work' },
 		{ id: 'projects', label: 'Projects' },
 		{ id: 'upstream', label: 'Open source' },
+		...(data.activity ? [{ id: 'activity', label: 'Activity' }] : []),
 		{ id: 'modelling', label: 'Modelling' },
 		{ id: 'education', label: 'Education' },
 		{ id: 'toolkit', label: 'Toolkit' }
-	];
+	]);
 </script>
 
 <svelte:head>
@@ -218,6 +220,18 @@
 			{/each}
 		</ol>
 	</section>
+	{#if data.activity}
+		<section class="shell section" id="activity">
+			<div class="section-head">
+				<h2>Activity</h2>
+				<p class="section-note">
+					{data.activity.total.toLocaleString('en-GB')} contributions on
+					<a href={profile.github} rel="noopener">GitHub</a> in the last year.
+				</p>
+			</div>
+			<ActivityGraph activity={data.activity} />
+		</section>
+	{/if}
 	<section class="shell section" id="modelling">
 		<div class="section-head">
 			<h2>3D modelling</h2>

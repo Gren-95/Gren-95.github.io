@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # Daily, so the activity graph and the GitHub-sourced project details stay
+  # current between pushes.
+  schedule:
+    - cron: '17 3 * * *'
 
 permissions:
   contents: read
