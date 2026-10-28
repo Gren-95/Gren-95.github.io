@@ -14,7 +14,7 @@ export interface Post {
 export const work: Post[] = [
 	{
 		period: 'Apr 2026 — present',
-		title: 'Junior Web Developer',
+		title: 'Junior Developer and IT Operations Specialist',
 		place: 'JELD-WEN Eesti AS',
 		placeUrl: 'https://www.swedoor.ee/',
 		logo: { src: 'logos/jeldwen.svg', width: 152, height: 43 },
