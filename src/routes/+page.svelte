@@ -507,11 +507,19 @@
 		max-width: 58ch;
 	}
 
+	/* Every row as tall as the tallest, so all cards match and the footers
+	   line up. While one card is open, rows size to their content instead:
+	   its Read more should not stretch the rest of the grid. The details
+	   element lives in ProjectEntry, hence :global. */
 	.grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+		grid-auto-rows: 1fr;
 		gap: 1.1rem;
-		/* Opening one card's Read more should not stretch its neighbours. */
+	}
+
+	.grid:has(:global(details[open])) {
+		grid-auto-rows: auto;
 		align-items: start;
 	}
 
