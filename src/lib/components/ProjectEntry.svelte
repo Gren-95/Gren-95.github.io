@@ -231,15 +231,18 @@
 		white-space: nowrap;
 	}
 
+	/* Three lines reserved whatever the tagline's length, so every card in a
+	   row is the same height. */
 	.tagline {
 		color: var(--ink);
+		min-height: calc(3 * 1.65em);
+		min-height: 3lh;
 	}
 
 	.more {
 		/* Lets the block size transition to and from auto, where supported.
 		   Elsewhere the text simply appears. */
 		interpolate-size: allow-keywords;
-		flex: 1;
 	}
 
 	.more::details-content {
