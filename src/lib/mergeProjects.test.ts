@@ -45,6 +45,14 @@ describe('mergeProjects', () => {
 		expect(() => mergeProjects(curated, [repo({ name: 'finch' })])).toThrow(/"wren" was not found/);
 	});
 
+	it('ignores a homepage that is just the repository page', () => {
+		const [own] = mergeProjects(curated, [
+			repo({ name: 'wren', homepage: 'https://github.com/Gren-95/wren/' })
+		]);
+
+		expect(own.homepage).toBeNull();
+	});
+
 	it('treats an unset homepage as absent rather than an empty link', () => {
 		const [blank] = mergeProjects(curated, [repo({ name: 'wren', homepage: '' })]);
 		const [live] = mergeProjects(curated, [
