@@ -36,7 +36,21 @@
 	};
 
 	// Small numbers read better spelled out in prose than as numerals.
-	const spelled = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+	const spelled = [
+		'no',
+		'one',
+		'two',
+		'three',
+		'four',
+		'five',
+		'six',
+		'seven',
+		'eight',
+		'nine',
+		'ten',
+		'eleven',
+		'twelve'
+	];
 	const projectCount = $derived.by(() => {
 		const word = spelled[data.projects.length] ?? String(data.projects.length);
 		return word.charAt(0).toUpperCase() + word.slice(1);

@@ -28,6 +28,20 @@ export const projects: CuratedProject[] = [
 		shot: { src: 'shots/hyprland-dots.webp', width: 1200, height: 750 }
 	},
 	{
+		repo: 'peaport',
+		tagline: 'A web control panel for Podman and Docker, with users and roles.',
+		period: '2026',
+		summary:
+			'Running containers for other people means sharing SSH or handing out the engine socket, which is root on the host. Peaport puts Podman or Docker behind a web panel with per-user roles: containers, Compose stacks, images, volumes, networks and pods, plus encrypted secrets, an audit log, live metrics and a terminal in the browser.',
+		exposes: ['TypeScript', 'Next.js', 'Podman', 'Docker', 'RBAC'],
+		shot: {
+			src: 'shots/peaport.webp',
+			width: 1200,
+			height: 750,
+			alt: 'Peaport dashboard with container counts, live usage, container states and disk usage'
+		}
+	},
+	{
 		repo: 'cc2-commander',
 		tagline: "Shares the Elegoo CC2 printer's single MQTT connection with every tool.",
 		period: '2026',
@@ -35,6 +49,20 @@ export const projects: CuratedProject[] = [
 			'The Elegoo Centauri Carbon 2 has a single MQTT slot, so only one client can talk to it at a time. This service holds that slot and shares it: a web dashboard, Mainsail and Fluidd through a Moonraker-compatible API, Prometheus and Telegram all work at once. It began as a fork of runnane/elegoo-web.',
 		exposes: ['TypeScript', 'Bun', 'MQTT', 'Moonraker', 'Prometheus'],
 		shot: { src: 'shots/cc2-commander.webp', width: 1200, height: 750 }
+	},
+	{
+		repo: 'wren',
+		tagline: 'A GNOME-style file manager, written in Rust on GTK4.',
+		period: '2026',
+		summary:
+			'A file manager written from scratch with GTK4 and libadwaita. Tabs keep their own history, grid and list views show cached thumbnails, copies report progress and ask before overwriting, renames can be undone, and the keyboard shortcuts match Nautilus.',
+		exposes: ['Rust', 'GTK4', 'libadwaita', 'GNOME'],
+		shot: {
+			src: 'shots/wren.webp',
+			width: 959,
+			height: 577,
+			alt: 'Wren main window showing the home directory in grid view'
+		}
 	},
 	{
 		repo: 'tailboard',
@@ -95,6 +123,20 @@ export const projects: CuratedProject[] = [
 			width: 1200,
 			height: 750,
 			alt: "Home Assistant dashboard with the current price, today's statistics and an hourly price chart"
+		}
+	},
+	{
+		repo: 'estonian-id-decoder',
+		tagline: 'Decodes an Estonian personal ID code, in the browser.',
+		period: '2026',
+		summary:
+			'An Estonian ID code holds a birth date, gender and checksum, but reading them by hand is easy to get wrong. This page decodes a code as you type: birth date, age, weekday, gender, serial number and whether the checksum holds. It runs entirely in the browser and sends nothing anywhere.',
+		exposes: ['JavaScript', 'no dependencies', 'client-side'],
+		shot: {
+			src: 'shots/estonian-id-decoder.webp',
+			width: 1200,
+			height: 750,
+			alt: 'The decoder showing a valid code: male, born 3 May 1976, aged 50, born on a Monday'
 		}
 	},
 	{

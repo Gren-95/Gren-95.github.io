@@ -39,8 +39,15 @@ export function mergeProjects(curated: CuratedProject[], repos: GitHubRepo[]): P
 			pushedAt: repo.pushed_at,
 			url: repo.html_url,
 			description: repo.description,
-			// GitHub returns '' rather than null for an unset homepage.
-			homepage: repo.homepage ? repo.homepage : null
+			// GitHub returns '' rather than null for an unset homepage, and some
+			// repositories set it to their own GitHub page, which is not a
+			// running instance either.
+			homepage: repo.homepage && !isOwnPage(repo.homepage, repo.html_url) ? repo.homepage : null
 		};
 	});
+}
+
+function isOwnPage(homepage: string, repoUrl: string): boolean {
+	const normalise = (url: string) => url.trim().replace(/\/+$/, '').toLowerCase();
+	return normalise(homepage) === normalise(repoUrl);
 }
