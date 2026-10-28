@@ -511,6 +511,8 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
 		gap: 1.1rem;
+		/* Opening one card's Read more should not stretch its neighbours. */
+		align-items: start;
 	}
 
 	.contributions {

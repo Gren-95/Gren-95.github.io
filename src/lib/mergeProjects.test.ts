@@ -17,7 +17,13 @@ function repo(overrides: Partial<GitHubRepo> & { name: string }): GitHubRepo {
 }
 
 const curated: CuratedProject[] = [
-	{ repo: 'wren', period: '2026', summary: 'A file manager.', exposes: ['tabs'] }
+	{
+		repo: 'wren',
+		period: '2026',
+		tagline: 'Files.',
+		summary: 'A file manager.',
+		exposes: ['tabs']
+	}
 ];
 
 describe('mergeProjects', () => {
@@ -52,7 +58,7 @@ describe('mergeProjects', () => {
 	it('preserves curated order rather than GitHub order', () => {
 		const two: CuratedProject[] = [
 			...curated,
-			{ repo: 'esc2pipe', period: '2024', summary: 'Pipes.', exposes: ['fish'] }
+			{ repo: 'esc2pipe', period: '2024', tagline: 'Pipes.', summary: 'Pipes.', exposes: ['fish'] }
 		];
 		const merged = mergeProjects(two, [repo({ name: 'esc2pipe' }), repo({ name: 'wren' })]);
 

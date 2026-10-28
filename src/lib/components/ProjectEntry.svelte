@@ -17,25 +17,38 @@
 	{#if project.shot}
 		<!-- Fixed aspect with object-fit, so screenshots of different shapes do
 		     not make the grid ragged. -->
-		<img
-			class="shot"
-			src="{base}/{project.shot.src}"
-			alt={project.shot.alt ?? `${project.repo} in use`}
-			width={project.shot.width}
-			height={project.shot.height}
-			loading="lazy"
-			decoding="async"
-		/>
+		<div class="shot">
+			<img
+				src="{base}/{project.shot.src}"
+				alt={project.shot.alt ?? `${project.repo} in use`}
+				width={project.shot.width}
+				height={project.shot.height}
+				loading="lazy"
+				decoding="async"
+			/>
+			<span class="period pill mono">{project.period}</span>
+		</div>
 	{/if}
 
 	<header class="head">
 		<h3 class="name">
 			<a href={project.url} rel="noopener">{project.repo}</a>
 		</h3>
-		<span class="period mono">{project.period}</span>
+		{#if !project.shot}
+			<span class="period mono">{project.period}</span>
+		{/if}
 	</header>
 
-	<p class="summary">{project.summary}</p>
+	<p class="tagline">{project.tagline}</p>
+
+	<!-- Native details: works without JavaScript, is keyboard operable, and
+	     keeps the full text in the page for search engines and the CV. -->
+	<details class="more">
+		<summary class="mono">
+			<span class="when-closed">Read more</span><span class="when-open">Show less</span>
+		</summary>
+		<p class="summary">{project.summary}</p>
+	</details>
 
 	<ul class="stack">
 		{#each project.exposes as tool (tool)}
@@ -81,6 +94,8 @@
 		height: 3px;
 		background: var(--lang);
 		border-radius: 10px 10px 0 0;
+		/* Above the screenshot, which would otherwise paint over it. */
+		z-index: 1;
 	}
 
 	.card:hover {
@@ -125,15 +140,37 @@
 	}
 
 	.shot {
-		display: block;
+		position: relative;
 		width: calc(100% + 2 * clamp(1.25rem, 3vw, 1.75rem));
 		margin: calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) 0.15rem;
-		/* Natural aspect, no forced ratio. The two screenshots are very
-		   different shapes; cropping to a common ratio magnified the square one
-		   until it was unreadable, and letterboxing it left half the panel
-		   empty. Uneven image heights are the honest trade. */
-		height: auto;
 		border-bottom: 1px solid var(--rule);
+		border-radius: 10px 10px 0 0;
+		overflow: hidden;
+	}
+
+	/* One shared ratio, cropped to fill, so every card's image is the same
+	   height. Anchored to the top, where the interesting part of a
+	   screenshot usually is. */
+	.shot img {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 10;
+		object-fit: cover;
+		object-position: top;
+	}
+
+	.shot .pill {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		padding: 0.2rem 0.65rem;
+		border-radius: 999px;
+		font-size: var(--step--1);
+		color: var(--ink);
+		background: color-mix(in oklab, var(--paper) 82%, transparent);
+		backdrop-filter: blur(6px);
+		box-shadow: 0 0 0 1px var(--rule);
 	}
 
 	.head {
@@ -156,9 +193,77 @@
 		white-space: nowrap;
 	}
 
+	.tagline {
+		color: var(--ink);
+	}
+
+	.more {
+		/* Lets the block size transition to and from auto, where supported.
+		   Elsewhere the text simply appears. */
+		interpolate-size: allow-keywords;
+		flex: 1;
+	}
+
+	.more::details-content {
+		block-size: 0;
+		overflow: clip;
+		transition:
+			block-size 0.3s ease,
+			content-visibility 0.3s allow-discrete;
+	}
+
+	.more[open]::details-content {
+		block-size: auto;
+	}
+
+	.more summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		width: fit-content;
+		list-style: none;
+		cursor: pointer;
+		color: var(--accent);
+		font-size: var(--step--1);
+		border-radius: 3px;
+	}
+
+	.more summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.more summary::after {
+		content: '';
+		width: 0.4em;
+		height: 0.4em;
+		border-right: 1.5px solid currentColor;
+		border-bottom: 1.5px solid currentColor;
+		transform: translateY(-0.15em) rotate(45deg);
+		transition: transform 0.2s ease;
+	}
+
+	.more[open] summary::after {
+		transform: translateY(0.1em) rotate(-135deg);
+	}
+
+	.more summary:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+
+	.more summary:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 3px;
+	}
+
+	.more[open] .when-closed,
+	.more:not([open]) .when-open {
+		display: none;
+	}
+
 	.summary {
 		color: var(--ink);
-		flex: 1;
+		padding-top: 0.6rem;
 	}
 
 	.stack {

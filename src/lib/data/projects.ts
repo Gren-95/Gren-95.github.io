@@ -1,8 +1,9 @@
 import type { CuratedProject } from '$lib/types/project';
 
 /**
- * The projects, roughly newest activity first. Each summary states the problem, what
- * was built, and what came of it. Reviewers skim, so the point goes first.
+ * The projects, roughly newest activity first. The tagline is the one line a
+ * skimming reader sees; the summary states the problem, what was built, and
+ * what came of it, and sits behind the card's Read more toggle.
  *
  * Live language, stars, last-push dates and demo links are merged in at build
  * time by src/routes/+page.server.ts.
@@ -10,6 +11,7 @@ import type { CuratedProject } from '$lib/types/project';
 export const projects: CuratedProject[] = [
 	{
 		repo: 'ha-relay-panel',
+		tagline: 'Turns relays into simple thermostats in Home Assistant.',
 		period: '2026',
 		summary:
 			'Running a relay as a thermostat in Home Assistant means hand-writing an automation for every room. This panel puts relays on a board, binds each to a temperature sensor and a set point, and writes the automation itself. If a sensor goes unavailable, the relay switches off.',
@@ -18,6 +20,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'hyprland-dots',
+		tagline: 'My Hyprland desktop shell, written from scratch in QML.',
 		period: '2025 - 2026',
 		summary:
 			"Most Hyprland setups stitch together other people's widgets, each with its own look and its own bugs. I wrote the whole shell in QML instead (bar, notifications, launcher and on-screen displays), so it all looks and behaves the same. It's what I run every day.",
@@ -26,6 +29,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'cc2-commander',
+		tagline: "Shares the Elegoo CC2 printer's single MQTT connection with every tool.",
 		period: '2026',
 		summary:
 			'The Elegoo Centauri Carbon 2 has a single MQTT slot, so only one client can talk to it at a time. This service holds that slot and shares it: a web dashboard, Mainsail and Fluidd through a Moonraker-compatible API, Prometheus and Telegram all work at once. It began as a fork of runnane/elegoo-web.',
@@ -34,6 +38,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'tailboard',
+		tagline: 'One page for all my self-hosted services and their status.',
 		period: '2026',
 		summary:
 			"A dozen self-hosted services means a dozen bookmarks and no idea which one is down. Tailboard puts them all on one page with their status, so I can see what's running and what's down in one place.",
@@ -42,6 +47,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'uptime-kuma-compact-theme',
+		tagline: 'A compact, full-width theme for Uptime Kuma status pages.',
 		period: '2026',
 		summary:
 			"Uptime Kuma's status page wastes a wall-mounted screen: wide gaps, uptime numbers overlapping names, ragged heartbeat bars. This is one CSS file for the Custom CSS field that packs monitors into a full-width grid, with status-coloured uptime pills and bottom-aligned bars.",
@@ -55,6 +61,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'sonic-siphon',
+		tagline: 'A self-hosted YouTube to MP3 downloader in a single Go binary.',
 		period: '2025 - 2026',
 		summary:
 			'Every YouTube-to-MP3 site is an ad farm that wants your links on its server. This is one Go binary you run yourself: paste a playlist, get the files back, nothing leaves your machine.',
@@ -63,6 +70,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'spawnpoint',
+		tagline: 'Lets friends run their own Minecraft servers from a browser.',
 		period: '2026',
 		summary:
 			'Friends kept asking me to spin up Minecraft worlds, which meant an SSH session every time. Spawnpoint puts start, stop, backups and the server console in a browser, so they can do it without me.',
@@ -71,6 +79,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'ha-elering-ee',
+		tagline: 'Estonian hourly electricity prices as a Home Assistant sensor.',
 		period: '2026',
 		summary:
 			"Estonian electricity prices swing hour to hour, but Home Assistant couldn't see them. This pulls Elering's hourly rates into a sensor, so an automation can hold the dishwasher until the cheap window.",
@@ -78,6 +87,7 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'esc2pipe',
+		tagline: 'A fish plugin that makes Escape type a pipe.',
 		period: '2023 - 2024',
 		summary:
 			"Some keyboard layouts hide the pipe character behind a key combination a laptop can't produce. This plugin for fish makes Escape type a pipe instead.",
