@@ -260,7 +260,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.6rem;
-		padding: var(--pad) var(--pad) calc(var(--pad) + 2rem);
+		padding: var(--pad) var(--pad) calc(var(--pad) + 3rem);
 		background: var(--raised);
 		border-radius: 10px;
 		overflow-y: auto;
@@ -291,11 +291,19 @@
 		padding: 0;
 	}
 
+	/* Open, the toggle is an opaque full-width bar pinned to the card's bottom
+	   edge, so the overlay's text and tags scroll cleanly behind it instead of
+	   colliding with it. */
 	.more[open] summary {
 		position: absolute;
-		left: var(--pad);
-		bottom: var(--pad);
+		left: 0;
+		right: 0;
+		bottom: 0;
 		z-index: 3;
+		padding: 0.6rem var(--pad);
+		background: var(--raised);
+		border-top: 1px solid var(--rule);
+		border-radius: 0 0 10px 10px;
 	}
 
 	.more summary {
