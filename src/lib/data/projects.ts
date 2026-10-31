@@ -75,10 +75,10 @@ export const projects: CuratedProject[] = [
 	},
 	{
 		repo: 'tailboard-companion',
-		tagline: 'Puts my Tailboard on every new tab, in a popup, and on right-click.',
+		tagline: 'My Tailboard in a popup, the address bar, and right-click. On AMO.',
 		period: '2026',
 		summary:
-			"The browser-side half of Tailboard. It shows the dashboard on every new tab, adds a toolbar popup that searches my links, an address-bar keyword, and a right-click launcher grouped by group. It opens each link's reachable address, so a service stays one click away even when its main URL is down.",
+			"The browser-side half of Tailboard, published on addons.mozilla.org. A toolbar popup searches my links, an address-bar keyword jumps to one, and a right-click launcher groups them. An optional toolbar badge counts services up or down, with options for the refresh interval, theme and where links open. It opens each link's reachable address, so a service stays one click away even when its main URL is down.",
 		exposes: ['browser extension', 'Manifest V3', 'Firefox', 'Chrome'],
 		shot: { src: 'shots/tailboard-companion.webp', width: 900, height: 562 }
 	},
