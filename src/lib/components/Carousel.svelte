@@ -28,7 +28,6 @@
 	/* Without script the row is a plain scrolling strip; the 3D stage starts once it runs. */
 	let live = $state(false);
 	let wantsPlay = $state(true);
-	let reducedMotion = $state(false);
 	let hovered = $state(false);
 	let focused = $state(false);
 	let dragging = $state(false);
@@ -39,9 +38,7 @@
 	let startX = 0;
 	let moved = false;
 
-	const playing = $derived(
-		wantsPlay && !reducedMotion && !hovered && !focused && !dragging && onScreen && count > 1
-	);
+	const playing = $derived(wantsPlay && !hovered && !focused && !dragging && onScreen && count > 1);
 
 	function go(way: -1 | 1) {
 		direction = way;
@@ -97,11 +94,6 @@
 		const element = stage;
 		if (!element) return;
 		live = true;
-		const motion = matchMedia('(prefers-reduced-motion: reduce)');
-		reducedMotion = motion.matches;
-		const onMotion = () => (reducedMotion = motion.matches);
-		motion.addEventListener('change', onMotion);
-
 		measure();
 		const resize = new ResizeObserver(measure);
 		resize.observe(element);
@@ -110,7 +102,6 @@
 		visible.observe(element);
 
 		return () => {
-			motion.removeEventListener('change', onMotion);
 			resize.disconnect();
 			visible.disconnect();
 		};
@@ -378,13 +369,5 @@
 		color: var(--muted);
 		font-size: var(--step--1);
 		min-width: 4.5rem;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.live .slide,
-		.live .slide::after {
-			transition: none;
-			animation: none;
-		}
 	}
 </style>
