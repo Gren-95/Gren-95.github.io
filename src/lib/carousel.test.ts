@@ -1,64 +1,62 @@
 import { describe, expect, it } from 'vitest';
-import { firstVisible, scrollEdges, visibleCount } from './carousel';
+import { circularOffset, visibleHalf, wrap } from './carousel';
 
-describe('scrollEdges', () => {
-	it('cannot go back at the start, and can go forward', () => {
-		expect(scrollEdges({ scrollLeft: 0, clientWidth: 600, scrollWidth: 1800 })).toEqual({
-			canPrev: false,
-			canNext: true
-		});
+describe('circularOffset', () => {
+	it('is zero for the centre slide and counts either side of it', () => {
+		expect(circularOffset(3, 3, 10)).toBe(0);
+		expect(circularOffset(4, 3, 10)).toBe(1);
+		expect(circularOffset(1, 3, 10)).toBe(-2);
 	});
 
-	it('can go both ways in the middle', () => {
-		expect(scrollEdges({ scrollLeft: 400, clientWidth: 600, scrollWidth: 1800 })).toEqual({
-			canPrev: true,
-			canNext: true
-		});
+	it('goes the short way round the end, so the row loops', () => {
+		expect(circularOffset(0, 9, 10)).toBe(1);
+		expect(circularOffset(9, 0, 10)).toBe(-1);
+		expect(circularOffset(8, 1, 10)).toBe(-3);
 	});
 
-	it('cannot go forward at the end, even when the position is fractional', () => {
-		expect(scrollEdges({ scrollLeft: 1199.4, clientWidth: 600, scrollWidth: 1800 })).toEqual({
-			canPrev: true,
-			canNext: false
-		});
+	it('puts the slide opposite the centre at the far edge', () => {
+		expect(Math.abs(circularOffset(5, 0, 10))).toBe(5);
 	});
 
-	it('cannot go either way when everything fits', () => {
-		expect(scrollEdges({ scrollLeft: 0, clientWidth: 900, scrollWidth: 900 })).toEqual({
-			canPrev: false,
-			canNext: false
-		});
+	it('copes with no slides', () => {
+		expect(circularOffset(0, 0, 0)).toBe(0);
 	});
 });
 
-describe('firstVisible', () => {
-	it('counts from zero and rounds to the nearest slide', () => {
-		expect(firstVisible(0, 300, 10)).toBe(0);
-		expect(firstVisible(140, 300, 10)).toBe(0);
-		expect(firstVisible(160, 300, 10)).toBe(1);
-		expect(firstVisible(900, 300, 10)).toBe(3);
+describe('wrap', () => {
+	it('steps forward and back', () => {
+		expect(wrap(3, 1, 10)).toBe(4);
+		expect(wrap(3, -1, 10)).toBe(2);
 	});
 
-	it('stays within the slides', () => {
-		expect(firstVisible(99999, 300, 10)).toBe(9);
-		expect(firstVisible(-50, 300, 10)).toBe(0);
+	it('loops at both ends', () => {
+		expect(wrap(9, 1, 10)).toBe(0);
+		expect(wrap(0, -1, 10)).toBe(9);
+	});
+
+	it('stays put with one slide or none', () => {
+		expect(wrap(0, 1, 1)).toBe(0);
+		expect(wrap(0, -1, 0)).toBe(0);
+	});
+});
+
+describe('visibleHalf', () => {
+	it('shows more on a wide stage and fewer on a narrow one', () => {
+		expect(visibleHalf(1100, 150, 14)).toBe(3);
+		expect(visibleHalf(900, 150, 14)).toBe(3);
+		expect(visibleHalf(500, 150, 14)).toBe(1);
+	});
+
+	it('never shows less than one a side, or more than four', () => {
+		expect(visibleHalf(200, 150, 14)).toBe(1);
+		expect(visibleHalf(4000, 150, 14)).toBe(4);
+	});
+
+	it('never shows more than the slides there are', () => {
+		expect(visibleHalf(4000, 150, 4)).toBe(2);
 	});
 
 	it('copes with nothing to measure', () => {
-		expect(firstVisible(100, 0, 10)).toBe(0);
-		expect(firstVisible(100, 300, 0)).toBe(0);
-	});
-});
-
-describe('visibleCount', () => {
-	it('counts the whole slides that fit', () => {
-		expect(visibleCount(1000, 300)).toBe(3);
-		expect(visibleCount(850, 300)).toBe(2);
-		expect(visibleCount(899.6, 300)).toBe(3);
-	});
-
-	it('is never less than one', () => {
-		expect(visibleCount(200, 300)).toBe(1);
-		expect(visibleCount(500, 0)).toBe(1);
+		expect(visibleHalf(1000, 0, 14)).toBe(1);
 	});
 });

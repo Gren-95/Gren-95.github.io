@@ -1,40 +1,56 @@
-<script lang="ts">
+<script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
-	import { firstVisible, scrollEdges, visibleCount } from '$lib/carousel';
+	import { circularOffset, visibleHalf, wrap } from '$lib/carousel';
 
-	let { label, count, children }: { label: string; count: number; children: Snippet } = $props();
+	let {
+		label,
+		items,
+		itemLabel,
+		slide
+	}: {
+		label: string;
+		items: T[];
+		itemLabel: (item: T) => string;
+		slide: Snippet<[T, number]>;
+	} = $props();
 
-	let track: HTMLDivElement | undefined = $state();
-	let canPrev = $state(false);
-	let canNext = $state(false);
-	let first = $state(0);
-	let shown = $state(1);
-	/* The buttons need script; without it the track still scrolls and snaps. */
-	let ready = $state(false);
+	/** Time on each slide while it plays by itself. */
+	const DWELL_MS = 4500;
+	/** A sideways drag of at least this many pixels turns the row. */
+	const SWIPE_PX = 45;
 
-	/** Distance from one slide's left edge to the next, gap included. */
-	function step(): number {
-		const slides = track?.children;
-		if (!slides || slides.length < 2) return track?.clientWidth ?? 0;
-		return (slides[1] as HTMLElement).offsetLeft - (slides[0] as HTMLElement).offsetLeft;
+	const count = $derived(items.length);
+
+	let active = $state(0);
+	let stage: HTMLDivElement | undefined = $state();
+	let half = $state(2);
+	/* Without script the row is a plain scrolling strip; the 3D stage starts once it runs. */
+	let live = $state(false);
+	let wantsPlay = $state(true);
+	let reducedMotion = $state(false);
+	let hovered = $state(false);
+	let focused = $state(false);
+	let dragging = $state(false);
+	let onScreen = $state(false);
+	let startX = 0;
+	let moved = false;
+
+	const playing = $derived(
+		wantsPlay && !reducedMotion && !hovered && !focused && !dragging && onScreen && count > 1
+	);
+
+	function go(direction: -1 | 1) {
+		active = wrap(active, direction, count);
 	}
 
 	function measure() {
-		if (!track) return;
-		({ canPrev, canNext } = scrollEdges(track));
-		first = firstVisible(track.scrollLeft, step(), count);
-		shown = visibleCount(track.clientWidth, step());
+		const first = stage?.querySelector<HTMLElement>('.slide');
+		if (!stage || !first) return;
+		half = visibleHalf(stage.clientWidth, first.offsetWidth * STEP_RATIO, count);
 	}
 
-	function go(direction: -1 | 1) {
-		if (!track) return;
-		const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-		// One page at a time, so a wide screen is not moved a single card.
-		track.scrollBy({
-			left: direction * step() * visibleCount(track.clientWidth, step()),
-			behavior: smooth ? 'smooth' : 'auto'
-		});
-	}
+	/** One step sideways, as a share of a slide's width. Keep in step with --step below. */
+	const STEP_RATIO = 0.8;
 
 	function onkeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowRight') {
@@ -46,83 +62,259 @@
 		}
 	}
 
+	function onpointerdown(event: PointerEvent) {
+		startX = event.clientX;
+		moved = false;
+		dragging = true;
+	}
+
+	function onpointerup(event: PointerEvent) {
+		if (!dragging) return;
+		dragging = false;
+		const travelled = event.clientX - startX;
+		if (Math.abs(travelled) >= SWIPE_PX) {
+			moved = true;
+			go(travelled < 0 ? 1 : -1);
+		}
+	}
+
+	function show(index: number) {
+		// A drag that ended on a slide is a swipe, not a choice of that slide.
+		if (moved) {
+			moved = false;
+			return;
+		}
+		active = index;
+	}
+
 	$effect(() => {
-		const element = track;
+		const element = stage;
 		if (!element) return;
-		ready = true;
+		live = true;
+		const motion = matchMedia('(prefers-reduced-motion: reduce)');
+		reducedMotion = motion.matches;
+		const onMotion = () => (reducedMotion = motion.matches);
+		motion.addEventListener('change', onMotion);
+
 		measure();
-		const observer = new ResizeObserver(measure);
-		observer.observe(element);
-		return () => observer.disconnect();
+		const resize = new ResizeObserver(measure);
+		resize.observe(element);
+		// Only turn while it can be seen, so it is not moving unseen or wasting the battery.
+		const visible = new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting));
+		visible.observe(element);
+
+		return () => {
+			motion.removeEventListener('change', onMotion);
+			resize.disconnect();
+			visible.disconnect();
+		};
 	});
 
-	const last = $derived(Math.min(count, first + shown));
+	$effect(() => {
+		if (!playing) return;
+		const timer = setInterval(() => go(1), DWELL_MS);
+		return () => clearInterval(timer);
+	});
 </script>
 
-<section class="carousel" aria-roledescription="carousel" aria-label={label}>
-	{#if ready}
-		<div class="controls">
-			<p class="position mono" aria-live="polite">
-				{first + 1}{last > first + 1 ? `-${last}` : ''} of {count}
-			</p>
-			<div class="buttons">
-				<button
-					type="button"
-					aria-label="Previous projects"
-					disabled={!canPrev}
-					onclick={() => go(-1)}
-				>
-					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
-				</button>
-				<button type="button" aria-label="Next projects" disabled={!canNext} onclick={() => go(1)}>
-					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
-				</button>
-			</div>
-		</div>
-	{/if}
-
-	<!-- A scrollable region has to be reachable by keyboard, so it takes focus and answers
-	     the arrow keys. It is a named group rather than a widget, hence the exceptions. -->
+<section
+	class="carousel"
+	aria-roledescription="carousel"
+	aria-label={label}
+	onmouseenter={() => (hovered = true)}
+	onmouseleave={() => (hovered = false)}
+	onfocusin={() => (focused = true)}
+	onfocusout={() => (focused = false)}
+>
+	<!-- A moving region has to be reachable by keyboard, so it takes focus and answers the
+	     arrow keys. It is a named group rather than a widget, hence the exceptions. -->
 	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
-		class="track"
-		bind:this={track}
-		onscroll={measure}
+		class="viewport"
+		class:live
+		bind:this={stage}
 		{onkeydown}
+		{onpointerdown}
+		{onpointerup}
+		onpointercancel={() => (dragging = false)}
 		tabindex="0"
 		role="group"
-		aria-label="{label}, scroll sideways"
+		aria-label="{label}, use the arrow keys to move"
+		style="--half: {half}"
 	>
-		{@render children()}
+		{#each items as item, index (index)}
+			{@const offset = circularOffset(index, active, count)}
+			{@const gone = Math.abs(offset) > half}
+			<div
+				class="slide"
+				class:current={offset === 0}
+				class:gone
+				style="--d: {offset}; --abs: {Math.abs(offset)}"
+			>
+				<div class="content" inert={live && offset !== 0}>
+					{@render slide(item, index)}
+				</div>
+				{#if live && offset !== 0 && !gone}
+					<button
+						class="peek"
+						type="button"
+						tabindex="-1"
+						aria-label="Show {itemLabel(item)}"
+						onclick={() => show(index)}
+					></button>
+				{/if}
+			</div>
+		{/each}
 	</div>
+
+	{#if live}
+		<div class="controls">
+			<button type="button" aria-label="Previous project" onclick={() => go(-1)}>
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+			</button>
+			<button
+				type="button"
+				aria-label={wantsPlay ? 'Pause moving' : 'Start moving'}
+				aria-pressed={!wantsPlay}
+				onclick={() => (wantsPlay = !wantsPlay)}
+			>
+				{#if wantsPlay}
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14" /></svg>
+				{:else}
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z" /></svg>
+				{/if}
+			</button>
+			<button type="button" aria-label="Next project" onclick={() => go(1)}>
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+			</button>
+			<!-- Read out only when it is not already changing by itself. -->
+			<p class="position mono" aria-live={playing ? 'off' : 'polite'}>
+				{active + 1} of {count}
+			</p>
+		</div>
+	{/if}
 </section>
 
 <style>
 	.carousel {
 		display: grid;
-		gap: 0.9rem;
+		gap: 0.75rem;
+		/* The width of a card, and how far one step sideways moves the next. */
+		--slide: 15.5rem;
+		--step: calc(var(--slide) * 0.8);
+	}
+
+	/* Without script: an ordinary strip that scrolls and snaps. */
+	.viewport {
+		display: flex;
+		gap: 1rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		padding-block: 0.4rem 0.9rem;
+		scrollbar-width: thin;
+		scrollbar-color: var(--rule-strong) transparent;
+	}
+
+	.viewport:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 4px;
+		border-radius: 10px;
+	}
+
+	.slide {
+		position: relative;
+		flex: 0 0 var(--slide);
+		scroll-snap-align: start;
+	}
+
+	.content {
+		height: 100%;
+	}
+
+	.content > :global(*) {
+		height: 100%;
+	}
+
+	/* With script: a stage in perspective. Every slide sits in the same cell and is moved
+	   out from the centre by its offset d, tilted towards the middle, pushed back and
+	   dimmed in proportion to how far it is. */
+	.viewport.live {
+		display: grid;
+		justify-items: center;
+		overflow: hidden;
+		scroll-snap-type: none;
+		perspective: 1200px;
+		perspective-origin: 50% 40%;
+		/* Room for the tilted slides and the centre one's shadow. */
+		padding: 1.5rem 0 2.25rem;
+		touch-action: pan-y;
+		user-select: none;
+		cursor: grab;
+	}
+
+	.viewport.live:active {
+		cursor: grabbing;
+	}
+
+	.live .slide {
+		grid-area: 1 / 1;
+		width: var(--slide);
+		flex: none;
+		z-index: calc(10 - var(--abs));
+		transform: translateX(calc(var(--d) * var(--step))) translateZ(calc(var(--abs) * -130px))
+			rotateY(clamp(-48deg, calc(var(--d) * -30deg), 48deg)) scale(calc(1 - var(--abs) * 0.04));
+		opacity: calc(1 - var(--abs) * 0.16);
+		transition:
+			transform 0.7s cubic-bezier(0.22, 0.8, 0.28, 1),
+			opacity 0.7s ease;
+		will-change: transform;
+	}
+
+	/* A slide beyond the edge waits out of sight and jumps to its place at once, so one
+	   going round the back of the loop is never seen crossing the stage. */
+	.live .slide.gone {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: none;
+	}
+
+	/* The shade that makes a far slide sit behind a near one. */
+	.live .slide::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: 10px;
+		background: var(--paper);
+		opacity: calc(var(--abs) * 0.2);
+		pointer-events: none;
+		transition: opacity 0.7s ease;
+	}
+
+	.live .slide.current {
+		filter: drop-shadow(0 22px 26px color-mix(in oklab, var(--ink) 22%, transparent));
+	}
+
+	.peek {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		padding: 0;
+		border: 0;
+		border-radius: 10px;
+		background: transparent;
+		cursor: pointer;
 	}
 
 	.controls {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
+		justify-content: center;
+		gap: 0.6rem;
 	}
 
-	.position {
-		margin: 0;
-		color: var(--muted);
-		font-size: var(--step--1);
-	}
-
-	.buttons {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	button {
+	.controls button {
 		display: grid;
 		place-items: center;
 		width: 2.5rem;
@@ -138,19 +330,14 @@
 			color 0.15s ease;
 	}
 
-	button:hover:not(:disabled) {
+	.controls button:hover {
 		color: var(--accent);
 		border-color: var(--accent);
 	}
 
-	button:disabled {
-		opacity: 0.35;
-		cursor: default;
-	}
-
-	button svg {
-		width: 1.15rem;
-		height: 1.15rem;
+	.controls svg {
+		width: 1.1rem;
+		height: 1.1rem;
 		fill: none;
 		stroke: currentColor;
 		stroke-width: 2;
@@ -158,33 +345,17 @@
 		stroke-linejoin: round;
 	}
 
-	.track {
-		display: flex;
-		gap: 1.1rem;
-		overflow-x: auto;
-		overscroll-behavior-x: contain;
-		scroll-snap-type: x mandatory;
-		/* Room for the cards' hover lift and their top hairline. */
-		padding-block: 0.4rem 0.9rem;
-		scrollbar-width: thin;
-		scrollbar-color: var(--rule-strong) transparent;
+	.position {
+		margin: 0 0 0 0.6rem;
+		color: var(--muted);
+		font-size: var(--step--1);
+		min-width: 4.5rem;
 	}
 
-	.track:focus-visible {
-		outline: 2px solid var(--accent);
-		outline-offset: 4px;
-		border-radius: 10px;
-	}
-
-	/* Every card is as tall as the tallest, so the row never looks ragged. */
-	.track > :global(*) {
-		flex: 0 0 min(21rem, 84%);
-		scroll-snap-align: start;
-	}
-
-	@media (min-width: 40rem) {
-		.track > :global(*) {
-			flex-basis: 21rem;
+	@media (prefers-reduced-motion: reduce) {
+		.live .slide,
+		.live .slide::after {
+			transition: none;
 		}
 	}
 </style>

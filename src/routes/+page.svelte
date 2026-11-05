@@ -105,6 +105,9 @@
 	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
 	const letters = profile.name.split('').map((letter) => (letter === ' ' ? '\u00A0' : letter));
 
+	/* Tags that name a language in the graph above take that language's colour. */
+	const graphLanguages = $derived(data.languages.map((language) => language.name));
+
 	const sections = $derived([
 		{ id: 'work', label: 'Work' },
 		{ id: 'projects', label: 'Projects' },
@@ -281,10 +284,14 @@
 		</div>
 		<LanguageMix languages={data.languages} classified={data.classified} />
 
-		<Carousel label="Projects" count={data.projects.length}>
-			{#each data.projects as project, index (project.repo)}
-				<ProjectEntry {project} {index} />
-			{/each}
+		<Carousel
+			label="Projects"
+			items={data.projects}
+			itemLabel={(project) => project.title ?? project.repo}
+		>
+			{#snippet slide(project, index)}
+				<ProjectEntry {project} {index} {graphLanguages} />
+			{/snippet}
 		</Carousel>
 	</section>
 	<section class="shell section" id="upstream">
