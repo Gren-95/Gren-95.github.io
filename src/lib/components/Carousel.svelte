@@ -11,7 +11,8 @@
 		label: string;
 		items: T[];
 		itemLabel: (item: T) => string;
-		slide: Snippet<[T, number]>;
+		/** Renders one item; the last argument says whether it is the one in the middle. */
+		slide: Snippet<[T, number, boolean]>;
 	} = $props();
 
 	/** Time on each slide while it plays by itself. */
@@ -153,7 +154,7 @@
 				style="--d: {offset}; --abs: {Math.abs(offset)}"
 			>
 				<div class="content" inert={live && offset !== 0}>
-					{@render slide(item, index)}
+					{@render slide(item, index, offset === 0)}
 				</div>
 				{#if live && offset !== 0 && !gone}
 					<button

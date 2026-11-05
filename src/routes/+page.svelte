@@ -289,8 +289,8 @@
 			items={data.projects}
 			itemLabel={(project) => project.title ?? project.repo}
 		>
-			{#snippet slide(project, index)}
-				<ProjectEntry {project} {index} {graphLanguages} />
+			{#snippet slide(project, index, current)}
+				<ProjectEntry {project} {index} {current} {graphLanguages} />
 			{/snippet}
 		</Carousel>
 	</section>
