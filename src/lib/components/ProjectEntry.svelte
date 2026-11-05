@@ -5,6 +5,9 @@
 	import { base } from '$app/paths';
 	import { languageColor } from '$lib/data/languageColors';
 
+	/** How long the turn takes. Keep in step with the transition in the style below. */
+	const TURN_MS = 760;
+
 	let {
 		project,
 		index,
@@ -31,12 +34,18 @@
 	}
 
 	let flipped = $state(false);
+	/* True while the card is turning, so it can rise towards the reader and settle. */
+	let turning = $state(false);
+	let settle: ReturnType<typeof setTimeout> | undefined;
 	let toBack: HTMLButtonElement | undefined = $state();
 	let toFront: HTMLButtonElement | undefined = $state();
 
 	/** Turns the card over, and moves focus to the button on the side that is now showing. */
 	async function flip(over: boolean) {
 		flipped = over;
+		turning = true;
+		clearTimeout(settle);
+		settle = setTimeout(() => (turning = false), TURN_MS);
 		await tick();
 		(over ? toFront : toBack)?.focus();
 	}
@@ -76,7 +85,7 @@
 	read by a crawler, and the face that is turned away is inert so the keyboard and a
 	screen reader never land on it.
 -->
-<article class="card" style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
+<article class="card" class:turning style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
 	<div class="turner" class:flipped>
 		<section class="face front" inert={flipped} aria-label={name}>
 			<div class="shot">
@@ -186,6 +195,17 @@
 		/* The room the turn needs to look like a turn rather than a squash. */
 		perspective: 1100px;
 		height: 29rem;
+	}
+
+	/* While it turns the card rises towards the reader, tips a little and settles again. */
+	.card.turning {
+		animation: rise 0.76s ease-in-out;
+	}
+
+	@keyframes rise {
+		50% {
+			transform: scale(1.09) rotate(-1.6deg);
+		}
 	}
 
 	.turner {
@@ -597,6 +617,10 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.card.turning {
+			animation: none;
+		}
+
 		.turner,
 		.face {
 			transition: none;

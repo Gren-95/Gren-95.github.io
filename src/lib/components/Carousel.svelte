@@ -33,6 +33,9 @@
 	let focused = $state(false);
 	let dragging = $state(false);
 	let onScreen = $state(false);
+	/* Which way the row last turned, and how many times: each move restarts the hop. */
+	let direction = $state<1 | -1>(1);
+	let moves = $state(0);
 	let startX = 0;
 	let moved = false;
 
@@ -40,8 +43,10 @@
 		wantsPlay && !reducedMotion && !hovered && !focused && !dragging && onScreen && count > 1
 	);
 
-	function go(direction: -1 | 1) {
-		active = wrap(active, direction, count);
+	function go(way: -1 | 1) {
+		direction = way;
+		moves += 1;
+		active = wrap(active, way, count);
 	}
 
 	function measure() {
@@ -142,7 +147,9 @@
 		tabindex="0"
 		role="group"
 		aria-label="{label}, use the arrow keys to move"
-		style="--half: {half}"
+		style="--half: {half}; --dir: {direction}{moves > 0
+			? `; --hop: hop-${moves % 2 ? 'a' : 'b'}`
+			: ''}"
 	>
 		{#each items as item, index (index)}
 			{@const offset = circularOffset(index, active, count)}
@@ -266,10 +273,29 @@
 		transform: translateX(calc(var(--d) * var(--step))) translateZ(calc(var(--abs) * -130px))
 			rotateY(clamp(-48deg, calc(var(--d) * -30deg), 48deg)) scale(calc(1 - var(--abs) * 0.04));
 		opacity: calc(1 - var(--abs) * 0.16);
+		/* A little overshoot, and the further a card is from the middle the later it sets
+		   off, so a move runs through the row like a wave. */
 		transition:
-			transform 0.7s cubic-bezier(0.22, 0.8, 0.28, 1),
-			opacity 0.7s ease;
+			transform 0.85s cubic-bezier(0.3, 1.18, 0.4, 1) calc(var(--abs) * 35ms),
+			opacity 0.7s ease calc(var(--abs) * 35ms);
+		/* Each move, the card also hops: up and over on a slight tilt, then down again.
+		   The name alternates so the same animation can start again on the next move. */
+		animation: var(--hop, none) 0.9s cubic-bezier(0.4, 0, 0.3, 1) calc(var(--abs) * 35ms);
 		will-change: transform;
+	}
+
+	@keyframes hop-a {
+		35% {
+			translate: 0 -26px;
+			rotate: calc(var(--dir) * -3deg);
+		}
+	}
+
+	@keyframes hop-b {
+		35% {
+			translate: 0 -26px;
+			rotate: calc(var(--dir) * -3deg);
+		}
 	}
 
 	/* A slide beyond the edge waits out of sight and jumps to its place at once, so one
@@ -279,6 +305,7 @@
 		visibility: hidden;
 		pointer-events: none;
 		transition: none;
+		animation: none;
 	}
 
 	/* The shade that makes a far slide sit behind a near one. */
@@ -357,6 +384,7 @@
 		.live .slide,
 		.live .slide::after {
 			transition: none;
+			animation: none;
 		}
 	}
 </style>
