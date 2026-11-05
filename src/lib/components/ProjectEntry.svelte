@@ -5,9 +5,6 @@
 	import { base } from '$app/paths';
 	import { languageColor } from '$lib/data/languageColors';
 
-	/** How long the turn takes. Keep in step with the transition in the style below. */
-	const TURN_MS = 760;
-
 	let {
 		project,
 		index,
@@ -34,18 +31,12 @@
 	}
 
 	let flipped = $state(false);
-	/* True while the card is turning, so it can rise towards the reader and settle. */
-	let turning = $state(false);
-	let settle: ReturnType<typeof setTimeout> | undefined;
 	let toBack: HTMLButtonElement | undefined = $state();
 	let toFront: HTMLButtonElement | undefined = $state();
 
 	/** Turns the card over, and moves focus to the button on the side that is now showing. */
 	async function flip(over: boolean) {
 		flipped = over;
-		turning = true;
-		clearTimeout(settle);
-		settle = setTimeout(() => (turning = false), TURN_MS);
 		await tick();
 		(over ? toFront : toBack)?.focus();
 	}
@@ -56,24 +47,44 @@
 	});
 
 	let stack: HTMLUListElement | undefined = $state();
-	let hiddenTags = $state(0);
 
-	/* Tags stay on one line on the front, so they never change the card's height.
-	   Count the ones the line cuts off, for the +N chip. */
+	/** Rows of tags the front has room for. */
+	const TAG_ROWS = 2;
+
+	/* The tags wrap onto at most two rows. The ones that would need a third are left out,
+	   and a +N chip says how many; one more is left out if the chip itself needs the room. */
 	$effect(() => {
 		const row = stack;
 		if (!row) return;
 
-		const measure = () => {
-			const edge = row.getBoundingClientRect().right;
-			hiddenTags = [...row.children].filter(
-				(tag) => tag.getBoundingClientRect().right > edge + 0.5
-			).length;
+		const layout = () => {
+			const chips = [...row.querySelectorAll<HTMLElement>('[data-chip]')];
+			const more = row.querySelector<HTMLElement>('[data-more]');
+			if (!chips.length || !more) return;
+			chips.forEach((chip) => (chip.hidden = false));
+			more.hidden = true;
+
+			const top = chips[0].offsetTop;
+			const gap = parseFloat(getComputedStyle(row).rowGap) || 0;
+			const step = chips[0].offsetHeight + gap;
+			const rowOf = (element: HTMLElement) => Math.round((element.offsetTop - top) / step);
+
+			let shown = chips.length;
+			const overflows = () =>
+				chips.slice(0, shown).some((chip) => rowOf(chip) >= TAG_ROWS) ||
+				(shown < chips.length && rowOf(more) >= TAG_ROWS);
+			while (shown > 1 && overflows()) {
+				shown -= 1;
+				chips[shown].hidden = true;
+				more.textContent = `+${chips.length - shown}`;
+				more.hidden = false;
+			}
 		};
 
-		const observer = new ResizeObserver(measure);
+		layout();
+		const observer = new ResizeObserver(layout);
 		observer.observe(row);
-		document.fonts.ready.then(measure);
+		document.fonts.ready.then(layout);
 		return () => observer.disconnect();
 	});
 </script>
@@ -85,7 +96,7 @@
 	read by a crawler, and the face that is turned away is inert so the keyboard and a
 	screen reader never land on it.
 -->
-<article class="card" class:turning style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
+<article class="card" style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
 	<div class="turner" class:flipped>
 		<section class="face front" inert={flipped} aria-label={name}>
 			<div class="shot">
@@ -113,22 +124,12 @@
 				<h3 class="title"><a href={project.url} rel="noopener">{name}</a></h3>
 				<p class="tagline">{project.tagline}</p>
 
-				<div class="tags">
-					<ul class="stack" bind:this={stack}>
-						{#each project.exposes as tool, i (tool)}
-							<li
-								class:cut={i >= project.exposes.length - hiddenTags}
-								class:tagged={tagColor(tool)}
-								style:--tag={tagColor(tool)}
-							>
-								{tool}
-							</li>
-						{/each}
-					</ul>
-					{#if hiddenTags > 0}
-						<span class="more-tags mono" aria-hidden="true">+{hiddenTags}</span>
-					{/if}
-				</div>
+				<ul class="stack" bind:this={stack} aria-label="Built with">
+					{#each project.exposes as tool (tool)}
+						<li data-chip class:tagged={tagColor(tool)} style:--tag={tagColor(tool)}>{tool}</li>
+					{/each}
+					<li class="more-tags mono" data-more hidden aria-hidden="true"></li>
+				</ul>
 
 				<button
 					class="turn mono"
@@ -197,17 +198,6 @@
 		height: 29rem;
 	}
 
-	/* While it turns the card rises towards the reader, tips a little and settles again. */
-	.card.turning {
-		animation: rise 0.76s ease-in-out;
-	}
-
-	@keyframes rise {
-		50% {
-			transform: scale(1.09) rotate(-1.6deg);
-		}
-	}
-
 	.turner {
 		position: relative;
 		display: grid;
@@ -272,7 +262,7 @@
 	.shot {
 		position: relative;
 		flex: none;
-		height: 12.5rem;
+		height: 11.5rem;
 		background: color-mix(in oklab, var(--lang) 14%, var(--paper));
 	}
 
@@ -374,44 +364,38 @@
 		overflow: hidden;
 	}
 
-	.tags {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		margin-top: auto;
-	}
-
-	/* One line, so the tags never change the card's height. The back lists them all. */
+	/* At most two rows, then a +N chip. The chip height is fixed so the rows can be counted. */
 	.stack {
+		--chip: 1.6rem;
 		display: flex;
-		flex: 1;
-		min-width: 0;
-		flex-wrap: nowrap;
-		overflow: hidden;
-		gap: 0.4rem;
-		list-style: none;
+		flex-wrap: wrap;
+		align-content: flex-start;
+		gap: 0.35rem;
 		margin: 0;
 		padding: 0;
-	}
-
-	/* The first tag gives way with an ellipsis rather than vanish, so a long one, such as
-	   "browser extension", never leaves the line empty. */
-	.stack li:first-child {
-		flex: 0 1 auto;
-		min-width: 0;
+		list-style: none;
+		max-height: calc(var(--chip) * 2 + 0.35rem);
 		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
-	/* A tag the line would cut mid-word is hidden whole; the +N chip counts it. */
-	.stack .cut {
-		visibility: hidden;
+	.stack [hidden] {
+		display: none;
+	}
+
+	.stack li {
+		display: inline-flex;
+		align-items: center;
+		height: var(--chip);
 	}
 
 	.stack li,
 	.built li {
 		flex: none;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		white-space: nowrap;
+		line-height: 1.2;
 		font-family: var(--mono);
 		font-size: var(--step--1);
 		color: var(--accent);
@@ -441,13 +425,10 @@
 		flex: none;
 	}
 
-	.more-tags {
-		flex: none;
-		font-size: var(--step--1);
+	.stack .more-tags {
 		color: var(--muted);
+		background: none;
 		border: 1px solid var(--rule-strong);
-		border-radius: 999px;
-		padding: 0.1rem 0.55rem;
 	}
 
 	/* ---- the button that turns the card ---- */
@@ -467,6 +448,11 @@
 		transition:
 			background 0.2s ease,
 			color 0.2s ease;
+	}
+
+	/* The button on the front sits at the foot of the card, whatever room the text leaves. */
+	.body .turn {
+		margin-top: auto;
 	}
 
 	.turn:hover {
@@ -613,27 +599,6 @@
 	@keyframes beat {
 		50% {
 			opacity: 0.25;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.card.turning {
-			animation: none;
-		}
-
-		.turner,
-		.face {
-			transition: none;
-		}
-
-		.pulse {
-			animation: none;
-		}
-
-		.turn svg,
-		.turn:hover svg {
-			transition: none;
-			transform: none;
 		}
 	}
 </style>
