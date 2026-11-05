@@ -1,32 +1,27 @@
-/** The measurements of a horizontally scrolling track. */
-export interface TrackMetrics {
-	scrollLeft: number;
-	clientWidth: number;
-	scrollWidth: number;
+/** How far slide `index` is from the centre one, the short way round, so the row loops. */
+export function circularOffset(index: number, active: number, count: number): number {
+	if (count <= 0) return 0;
+	let offset = (index - active) % count;
+	if (offset > count / 2) offset -= count;
+	if (offset < -count / 2) offset += count;
+	return offset;
 }
 
-/** Pixels of slack, since scroll positions are fractional on high-density screens. */
-const EDGE_TOLERANCE = 2;
-
-/** Whether the track can still scroll back, and forward. */
-export function scrollEdges({ scrollLeft, clientWidth, scrollWidth }: TrackMetrics) {
-	return {
-		canPrev: scrollLeft > EDGE_TOLERANCE,
-		canNext: scrollLeft + clientWidth < scrollWidth - EDGE_TOLERANCE
-	};
+/** The slide after `active`, going round to the first after the last. */
+export function wrap(active: number, direction: -1 | 1, count: number): number {
+	if (count <= 0) return 0;
+	return (((active + direction) % count) + count) % count;
 }
 
 /**
- * The slide whose left edge is nearest to the track's left edge, counting from 0.
- * `step` is the distance from one slide's left edge to the next.
+ * How many slides to show on each side of the centre one. Each step sideways moves a slide
+ * `step` pixels, and a slide is shown while its centre is still inside the stage.
  */
-export function firstVisible(scrollLeft: number, step: number, count: number): number {
-	if (step <= 0 || count <= 0) return 0;
-	return Math.min(count - 1, Math.max(0, Math.round(scrollLeft / step)));
+export function visibleHalf(stageWidth: number, step: number, count: number): number {
+	if (step <= 0) return 1;
+	const fits = Math.floor(stageWidth / 2 / step);
+	return Math.max(1, Math.min(fits, Math.floor(count / 2), MAX_HALF));
 }
 
-/** How many whole slides fit in view at once, at least one. */
-export function visibleCount(clientWidth: number, step: number): number {
-	if (step <= 0) return 1;
-	return Math.max(1, Math.floor((clientWidth + 1) / step));
-}
+/** More than this many on a side stops adding anything the eye can tell apart. */
+const MAX_HALF = 4;

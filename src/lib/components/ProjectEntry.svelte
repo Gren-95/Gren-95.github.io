@@ -4,7 +4,16 @@
 	import { base } from '$app/paths';
 	import { languageColor } from '$lib/data/languageColors';
 
-	let { project, index }: { project: Project; index: number } = $props();
+	let {
+		project,
+		index,
+		graphLanguages = []
+	}: { project: Project; index: number; graphLanguages?: string[] } = $props();
+
+	/** The colour of a tag that names a language in the graph, or nothing for any other tag. */
+	function tagColor(tag: string): string | undefined {
+		return graphLanguages.includes(tag) ? languageColor(tag) : undefined;
+	}
 
 	const lang = $derived(languageColor(project.language));
 
@@ -76,7 +85,7 @@
 			<p class="summary">{project.summary}</p>
 			<ul class="overlay-tags" aria-hidden="true">
 				{#each project.exposes as tool (tool)}
-					<li>{tool}</li>
+					<li class:tagged={tagColor(tool)} style:--tag={tagColor(tool)}>{tool}</li>
 				{/each}
 			</ul>
 		</div>
@@ -85,7 +94,13 @@
 	<div class="tags">
 		<ul class="stack" bind:this={stack}>
 			{#each project.exposes as tool, i (tool)}
-				<li class:cut={i >= project.exposes.length - hiddenTags}>{tool}</li>
+				<li
+					class:cut={i >= project.exposes.length - hiddenTags}
+					class:tagged={tagColor(tool)}
+					style:--tag={tagColor(tool)}
+				>
+					{tool}
+				</li>
 			{/each}
 		</ul>
 		{#if hiddenTags > 0}
@@ -121,7 +136,7 @@
 		background: var(--raised);
 		border: 1px solid var(--rule);
 		border-radius: 10px;
-		--pad: clamp(1.25rem, 3vw, 1.75rem);
+		--pad: 1.1rem;
 		padding: var(--pad);
 		transition:
 			border-color 0.15s ease,
@@ -184,8 +199,8 @@
 
 	.shot {
 		position: relative;
-		width: calc(100% + 2 * clamp(1.25rem, 3vw, 1.75rem));
-		margin: calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) 0.15rem;
+		width: calc(100% + 2 * var(--pad));
+		margin: calc(-1 * var(--pad)) calc(-1 * var(--pad)) 0.15rem;
 		border-bottom: 1px solid var(--rule);
 		border-radius: 10px 10px 0 0;
 		overflow: hidden;
@@ -224,7 +239,7 @@
 	}
 
 	.name {
-		font-size: var(--step-1);
+		font-size: 1.2rem;
 	}
 
 	.name a {
@@ -236,12 +251,12 @@
 		white-space: nowrap;
 	}
 
-	/* Three lines reserved whatever the tagline's length, so every card in a
+	/* Four lines reserved whatever the tagline's length, so every card in a
 	   row is the same height. */
 	.tagline {
 		color: var(--ink);
-		min-height: calc(3 * 1.65em);
-		min-height: 3lh;
+		min-height: calc(4 * 1.65em);
+		min-height: 4lh;
 	}
 
 	/* The toggle leaves the flow when it moves to the corner; keep its line
@@ -392,6 +407,27 @@
 		background: var(--accent-wash);
 		border-radius: 999px;
 		padding: 0.15rem 0.65rem;
+	}
+
+	/* A tag that names a language in the graph wears that language's colour: a dot,
+	   a ring and a wash of it. The name is still written, so colour is never the only cue. */
+	.tagged {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--ink);
+		background: color-mix(in oklab, var(--tag) 16%, var(--raised));
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tag) 55%, transparent);
+	}
+
+	.tagged::before {
+		content: '';
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--tag);
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 28%, transparent);
+		flex: none;
 	}
 
 	.more-tags {
