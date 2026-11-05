@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import type { Project } from '$lib/types/project';
 	import { reveal } from '$lib/actions/reveal';
 	import { base } from '$app/paths';
@@ -7,26 +8,49 @@
 	let {
 		project,
 		index,
+		current = true,
 		graphLanguages = []
-	}: { project: Project; index: number; graphLanguages?: string[] } = $props();
+	}: {
+		project: Project;
+		index: number;
+		/** Whether this card is the one in the middle of the carousel. */
+		current?: boolean;
+		graphLanguages?: string[];
+	} = $props();
+
+	const lang = $derived(languageColor(project.language));
+	const name = $derived(project.title ?? project.repo);
+
+	const updated = $derived(
+		new Date(project.pushedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+	);
 
 	/** The colour of a tag that names a language in the graph, or nothing for any other tag. */
 	function tagColor(tag: string): string | undefined {
 		return graphLanguages.includes(tag) ? languageColor(tag) : undefined;
 	}
 
-	const lang = $derived(languageColor(project.language));
+	let flipped = $state(false);
+	let toBack: HTMLButtonElement | undefined = $state();
+	let toFront: HTMLButtonElement | undefined = $state();
 
-	const updated = $derived(
-		new Date(project.pushedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-	);
+	/** Turns the card over, and moves focus to the button on the side that is now showing. */
+	async function flip(over: boolean) {
+		flipped = over;
+		await tick();
+		(over ? toFront : toBack)?.focus();
+	}
 
-	let details: HTMLDetailsElement | undefined = $state();
+	// A card that leaves the middle turns back, so it is the front that comes round again.
+	$effect(() => {
+		if (!current) flipped = false;
+	});
+
 	let stack: HTMLUListElement | undefined = $state();
 	let hiddenTags = $state(0);
 
-	/* Tags stay on one line while the card is collapsed, so they never change
-	   its height. Count the ones the line cuts off, for the +N chip. */
+	/* Tags stay on one line on the front, so they never change the card's height.
+	   Count the ones the line cuts off, for the +N chip. */
 	$effect(() => {
 		const row = stack;
 		if (!row) return;
@@ -45,341 +69,299 @@
 	});
 </script>
 
+<!--
+	A card with two faces. The front is a poster: the screenshot, the name and the one
+	line. Turning it over shows the story, what it is built with and where to find it.
+	The text of both faces is in the page whichever is showing, so it can be searched and
+	read by a crawler, and the face that is turned away is inert so the keyboard and a
+	screen reader never land on it.
+-->
 <article class="card" style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
-	{#if project.shot}
-		<!-- Fixed aspect with object-fit, so screenshots of different shapes do
-		     not make the grid ragged. -->
-		<div class="shot">
-			<img
-				src="{base}/{project.shot.src}"
-				alt={project.shot.alt ?? `${project.repo} in use`}
-				width={project.shot.width}
-				height={project.shot.height}
-				loading="lazy"
-				decoding="async"
-			/>
-			<span class="period pill mono">{project.period}</span>
-		</div>
-	{/if}
+	<div class="turner" class:flipped>
+		<section class="face front" inert={flipped} aria-label={name}>
+			<div class="shot">
+				{#if project.shot}
+					<img
+						src="{base}/{project.shot.src}"
+						alt={project.shot.alt ?? `${project.repo} in use`}
+						width={project.shot.width}
+						height={project.shot.height}
+						loading="lazy"
+						decoding="async"
+					/>
+				{:else}
+					<span class="no-shot mono" aria-hidden="true">{name}</span>
+				{/if}
+				<span class="pill period mono">{project.period}</span>
+				{#if project.language}
+					<span class="pill language mono"
+						><span class="dot" aria-hidden="true"></span>{project.language}</span
+					>
+				{/if}
+			</div>
 
-	<header class="head">
-		<h3 class="name">
-			<a href={project.url} rel="noopener">{project.title ?? project.repo}</a>
-		</h3>
-		{#if !project.shot}
-			<span class="period mono">{project.period}</span>
-		{/if}
-	</header>
+			<div class="body">
+				<h3 class="title"><a href={project.url} rel="noopener">{name}</a></h3>
+				<p class="tagline">{project.tagline}</p>
 
-	<p class="tagline">{project.tagline}</p>
+				<div class="tags">
+					<ul class="stack" bind:this={stack}>
+						{#each project.exposes as tool, i (tool)}
+							<li
+								class:cut={i >= project.exposes.length - hiddenTags}
+								class:tagged={tagColor(tool)}
+								style:--tag={tagColor(tool)}
+							>
+								{tool}
+							</li>
+						{/each}
+					</ul>
+					{#if hiddenTags > 0}
+						<span class="more-tags mono" aria-hidden="true">+{hiddenTags}</span>
+					{/if}
+				</div>
 
-	<!-- Native details: works without JavaScript, is keyboard operable, and
-	     keeps the full text in the page for search engines. Open, it covers
-	     the card rather than growing it, so no other card moves. -->
-	<details class="more" bind:this={details}>
-		<summary class="mono">
-			<span class="when-closed">Read more</span><span class="when-open">Show less</span>
-		</summary>
-		<div class="overlay">
-			<p class="overlay-name" aria-hidden="true">{project.title ?? project.repo}</p>
+				<button
+					class="turn mono"
+					type="button"
+					bind:this={toBack}
+					aria-label="Turn {name} over for the story and the details"
+					onclick={() => flip(true)}
+				>
+					The story
+					<svg viewBox="0 0 24 24" aria-hidden="true"
+						><path
+							d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"
+						/></svg
+					>
+				</button>
+			</div>
+		</section>
+
+		<section class="face back" inert={!flipped} aria-label="{name}, the story">
+			<header class="back-head">
+				<h3 class="back-title">{name}</h3>
+				<button
+					class="turn round"
+					type="button"
+					bind:this={toFront}
+					aria-label="Turn {name} back"
+					onclick={() => flip(false)}
+				>
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+				</button>
+			</header>
+
 			<p class="summary">{project.summary}</p>
-			<ul class="overlay-tags" aria-hidden="true">
+
+			<ul class="built" aria-label="Built with">
 				{#each project.exposes as tool (tool)}
 					<li class:tagged={tagColor(tool)} style:--tag={tagColor(tool)}>{tool}</li>
 				{/each}
 			</ul>
-		</div>
-	</details>
 
-	<div class="tags">
-		<ul class="stack" bind:this={stack}>
-			{#each project.exposes as tool, i (tool)}
-				<li
-					class:cut={i >= project.exposes.length - hiddenTags}
-					class:tagged={tagColor(tool)}
-					style:--tag={tagColor(tool)}
-				>
-					{tool}
-				</li>
-			{/each}
-		</ul>
-		{#if hiddenTags > 0}
-			<button
-				class="more-tags mono"
-				type="button"
-				aria-label="Show all {project.exposes.length} tags"
-				onclick={() => details && (details.open = true)}>+{hiddenTags}</button
-			>
-		{/if}
+			<p class="facts mono">
+				<span>{project.period}</span>
+				<span>Updated {updated}</span>
+				{#if project.language}
+					<span class="lang"><span class="dot" aria-hidden="true"></span>{project.language}</span>
+				{/if}
+				{#if project.stars > 0}<span>{project.stars} ★</span>{/if}
+			</p>
+
+			<div class="actions">
+				<a class="action primary" href={project.url} rel="noopener">Repository</a>
+				{#if project.homepage}
+					<a class="action" href={project.homepage} rel="noopener">
+						<span class="pulse" aria-hidden="true"></span>Live
+					</a>
+				{/if}
+			</div>
+		</section>
 	</div>
-
-	<footer class="meta mono">
-		{#if project.homepage}
-			<a class="live" href={project.homepage} rel="noopener">
-				<span class="pulse" aria-hidden="true"></span>Live
-			</a>
-		{/if}
-		{#if project.language}
-			<span class="lang"><span class="dot" aria-hidden="true"></span>{project.language}</span>
-		{/if}
-		{#if project.stars > 0}<span>{project.stars} ★</span>{/if}
-		<span>Updated {updated}</span>
-	</footer>
 </article>
 
 <style>
 	.card {
+		/* The room the turn needs to look like a turn rather than a squash. */
+		perspective: 1100px;
+		height: 29rem;
+	}
+
+	.turner {
+		position: relative;
+		display: grid;
+		height: 100%;
+		transform-style: preserve-3d;
+		/* Symmetric, so the card is edge-on at exactly half the time, when the faces swap. */
+		transition: transform 0.75s cubic-bezier(0.42, 0, 0.58, 1);
+	}
+
+	.turner.flipped {
+		transform: rotateY(180deg);
+	}
+
+	.face {
+		grid-area: 1 / 1;
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		gap: 0.85rem;
+		min-height: 0;
+		overflow: hidden;
 		background: var(--raised);
 		border: 1px solid var(--rule);
-		border-radius: 10px;
-		--pad: 1.1rem;
-		padding: var(--pad);
-		transition:
-			border-color 0.15s ease,
-			transform 0.15s ease;
+		border-radius: 14px;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+		box-shadow: 0 1px 0 color-mix(in oklab, var(--lang) 40%, transparent) inset;
 	}
 
-	/* A hairline of the language's own colour along the top edge. Identity is
-	   still carried by the name in the meta row; this only reinforces it. */
-	.card::before {
+	/* The face that is turned away is also hidden, at the moment the card is edge-on, since
+	   hiding the back alone is not reliable for everything drawn on a face. */
+	.face {
+		transition: visibility 0s linear 0.375s;
+	}
+
+	.turner.flipped .front,
+	.turner:not(.flipped) .back {
+		visibility: hidden;
+	}
+
+	.back {
+		transform: rotateY(180deg);
+		padding: 1.1rem;
+		gap: 0.8rem;
+		background: linear-gradient(
+			180deg,
+			color-mix(in oklab, var(--lang) 16%, var(--raised)),
+			var(--raised) 45%
+		);
+	}
+
+	/* The language's own colour, along the bottom of the front: the mark of the card. */
+	.front::after {
 		content: '';
 		position: absolute;
-		inset: -1px -1px auto;
-		height: 3px;
+		inset: auto 0 0;
+		height: 4px;
 		background: var(--lang);
-		border-radius: 10px 10px 0 0;
-		/* Above the screenshot and the Read more overlay. */
-		z-index: 2;
 	}
 
-	.card:hover {
-		border-color: var(--accent);
-		transform: translateY(-3px);
-	}
-
-	.card:hover .name {
-		color: var(--accent);
-	}
-
-	.live {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		color: var(--accent);
-		font-weight: 500;
-		text-decoration: none;
-	}
-
-	.live:hover {
-		text-decoration: underline;
-		text-underline-offset: 0.2em;
-	}
-
-	.pulse {
-		width: 0.4rem;
-		height: 0.4rem;
-		border-radius: 50%;
-		background: currentColor;
-		animation: beat 2s ease-in-out infinite;
-	}
-
-	@keyframes beat {
-		50% {
-			opacity: 0.25;
-		}
-	}
-
-	.name {
-		transition: color 0.2s ease;
-	}
+	/* ---- front ---- */
 
 	.shot {
 		position: relative;
-		width: calc(100% + 2 * var(--pad));
-		margin: calc(-1 * var(--pad)) calc(-1 * var(--pad)) 0.15rem;
-		border-bottom: 1px solid var(--rule);
-		border-radius: 10px 10px 0 0;
-		overflow: hidden;
+		flex: none;
+		height: 12.5rem;
+		background: color-mix(in oklab, var(--lang) 14%, var(--paper));
 	}
 
-	/* One shared ratio, cropped to fill, so every card's image is the same
-	   height. Anchored to the top, where the interesting part of a
-	   screenshot usually is. */
 	.shot img {
 		display: block;
 		width: 100%;
-		height: auto;
-		aspect-ratio: 16 / 10;
+		height: 100%;
 		object-fit: cover;
 		object-position: top;
 	}
 
-	.shot .pill {
+	/* The picture dissolves into the card instead of ending on a hard edge. */
+	.shot::after {
+		content: '';
 		position: absolute;
-		top: 0.75rem;
-		right: 0.75rem;
-		padding: 0.2rem 0.65rem;
+		inset: 0;
+		background: linear-gradient(to top, var(--raised), transparent 42%);
+		pointer-events: none;
+	}
+
+	.no-shot {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		color: var(--muted);
+		font-size: var(--step-1);
+	}
+
+	.pill {
+		position: absolute;
+		top: 0.65rem;
+		z-index: 1;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.15rem 0.6rem;
 		border-radius: 999px;
 		font-size: var(--step--1);
 		color: var(--ink);
-		background: color-mix(in oklab, var(--paper) 82%, transparent);
-		backdrop-filter: blur(6px);
+		background: color-mix(in oklab, var(--paper) 88%, transparent);
+		/* No backdrop blur: it stops a face from hiding its back when it is turned away. */
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
 		box-shadow: 0 0 0 1px var(--rule);
 	}
 
-	.head {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	.name {
-		font-size: 1.2rem;
-	}
-
-	.name a {
-		text-decoration: none;
-	}
-
 	.period {
-		color: var(--muted);
-		white-space: nowrap;
+		left: 0.65rem;
 	}
 
-	/* Four lines reserved whatever the tagline's length, so every card in a
-	   row is the same height. */
-	.tagline {
-		color: var(--ink);
-		min-height: calc(4 * 1.65em);
-		min-height: 4lh;
+	.language {
+		right: 0.65rem;
 	}
 
-	/* The toggle leaves the flow when it moves to the corner; keep its line
-	   so the open card's content, and so its row, does not get shorter. */
-	.more {
-		min-height: 1.65em;
-		min-height: 1lh;
+	.dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--lang);
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 28%, transparent);
+		flex: none;
 	}
 
-	/* The open card shows its full text over itself, image included, and
-	   keeps its size. The toggle moves to the bottom corner, above it. */
-	.overlay {
-		position: absolute;
-		inset: 0;
-		z-index: 1;
+	.body {
 		display: flex;
+		flex: 1;
 		flex-direction: column;
 		gap: 0.6rem;
-		padding: var(--pad) var(--pad) calc(var(--pad) + 3rem);
-		background: var(--raised);
-		border-radius: 10px;
-		overflow-y: auto;
-		animation: overlay-in 0.2s ease;
+		min-height: 0;
+		padding: 0.1rem 1.05rem 1.15rem;
 	}
 
-	@keyframes overlay-in {
-		from {
-			opacity: 0;
-			transform: translateY(6px);
-		}
-	}
-
-	.overlay-name {
-		font-family: var(--display);
-		font-weight: 600;
-		letter-spacing: -0.02em;
-		font-size: var(--step-1);
-		line-height: 1.1;
-	}
-
-	.overlay-tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		list-style: none;
+	.title {
 		margin: 0;
-		padding: 0;
+		font-family: var(--display);
+		font-size: 1.4rem;
+		line-height: 1.1;
+		letter-spacing: -0.03em;
 	}
 
-	/* Open, the toggle is an opaque full-width bar pinned to the card's bottom
-	   edge, so the overlay's text and tags scroll cleanly behind it instead of
-	   colliding with it. */
-	.more[open] summary {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 3;
-		padding: 0.6rem var(--pad);
-		background: var(--raised);
-		border-top: 1px solid var(--rule);
-		border-radius: 0 0 10px 10px;
+	.title a {
+		text-decoration: none;
+		transition: color 0.2s ease;
 	}
 
-	.more summary {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
-		width: fit-content;
-		list-style: none;
-		cursor: pointer;
+	.title a:hover {
 		color: var(--accent);
-		font-size: var(--step--1);
-		border-radius: 3px;
 	}
 
-	.more summary::-webkit-details-marker {
-		display: none;
-	}
-
-	.more summary::after {
-		content: '';
-		width: 0.4em;
-		height: 0.4em;
-		border-right: 1.5px solid currentColor;
-		border-bottom: 1.5px solid currentColor;
-		transform: translateY(-0.15em) rotate(45deg);
-		transition: transform 0.2s ease;
-	}
-
-	.more[open] summary::after {
-		transform: translateY(0.1em) rotate(-135deg);
-	}
-
-	.more summary:hover {
-		text-decoration: underline;
-		text-underline-offset: 0.2em;
-	}
-
-	.more summary:focus-visible {
-		outline: 2px solid var(--accent);
-		outline-offset: 3px;
-	}
-
-	.more[open] .when-closed,
-	.more:not([open]) .when-open {
-		display: none;
-	}
-
-	.summary {
-		color: var(--ink);
-		font-size: 0.94em;
-		line-height: 1.6;
+	.tagline {
+		margin: 0;
+		color: var(--muted);
+		font-size: 0.93rem;
+		line-height: 1.5;
+		display: -webkit-box;
+		-webkit-line-clamp: 4;
+		line-clamp: 4;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 
 	.tags {
 		display: flex;
 		align-items: center;
 		gap: 0.4rem;
+		margin-top: auto;
 	}
 
-	/* One line, so the tags never change the card's height. The Read more
-	   overlay lists them all. */
+	/* One line, so the tags never change the card's height. The back lists them all. */
 	.stack {
 		display: flex;
 		flex: 1;
@@ -392,13 +374,22 @@
 		padding: 0;
 	}
 
+	/* The first tag gives way with an ellipsis rather than vanish, so a long one, such as
+	   "browser extension", never leaves the line empty. */
+	.stack li:first-child {
+		flex: 0 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	/* A tag the line would cut mid-word is hidden whole; the +N chip counts it. */
 	.stack .cut {
 		visibility: hidden;
 	}
 
 	.stack li,
-	.overlay-tags li {
+	.built li {
 		flex: none;
 		white-space: nowrap;
 		font-family: var(--mono);
@@ -409,8 +400,8 @@
 		padding: 0.15rem 0.65rem;
 	}
 
-	/* A tag that names a language in the graph wears that language's colour: a dot,
-	   a ring and a wash of it. The name is still written, so colour is never the only cue. */
+	/* A tag that names a language in the graph wears that language's colour: a dot, a ring
+	   and a wash of it. The name is still written, so colour is never the only cue. */
 	.tagged {
 		display: inline-flex;
 		align-items: center;
@@ -434,47 +425,191 @@
 		flex: none;
 		font-size: var(--step--1);
 		color: var(--muted);
-		background: none;
 		border: 1px solid var(--rule-strong);
 		border-radius: 999px;
 		padding: 0.1rem 0.55rem;
-		cursor: pointer;
 	}
 
-	.more-tags:hover {
+	/* ---- the button that turns the card ---- */
+
+	.turn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.9rem;
+		font-size: var(--step--1);
 		color: var(--accent);
-		border-color: var(--accent);
+		background: transparent;
+		border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+		border-radius: 999px;
+		cursor: pointer;
+		transition:
+			background 0.2s ease,
+			color 0.2s ease;
 	}
 
-	.more-tags:focus-visible {
+	.turn:hover {
+		color: var(--paper);
+		background: var(--accent);
+	}
+
+	.turn:focus-visible,
+	.action:focus-visible {
 		outline: 2px solid var(--accent);
-		outline-offset: 2px;
+		outline-offset: 3px;
 	}
 
-	/* Separators are gaps, not pseudo-element dots: a wrapped row must never
-	   start a line with a dangling middot. */
+	.turn svg {
+		width: 1rem;
+		height: 1rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		transition: transform 0.5s ease;
+	}
+
+	.turn:hover svg {
+		transform: rotate(180deg);
+	}
+
+	.turn.round {
+		flex: none;
+		width: 2.1rem;
+		height: 2.1rem;
+		padding: 0;
+	}
+
+	.turn.round svg {
+		transform: none;
+	}
+
+	/* ---- back ---- */
+
+	.back-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.back-title {
+		margin: 0;
+		font-family: var(--display);
+		font-size: 1.15rem;
+		line-height: 1.15;
+		letter-spacing: -0.02em;
+	}
+
+	.summary {
+		flex: 1;
+		min-height: 0;
+		margin: 0;
+		overflow-y: auto;
+		/* The last line fades out, so a longer text reads as one that scrolls. */
+		mask-image: linear-gradient(to bottom, black calc(100% - 1.5rem), transparent);
+		padding-bottom: 1.25rem;
+		font-size: 0.9rem;
+		line-height: 1.6;
+		scrollbar-width: thin;
+		scrollbar-color: var(--rule-strong) transparent;
+	}
+
+	.built {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.facts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.2rem 0.9rem;
+		margin: 0;
+		padding-top: 0.65rem;
+		border-top: 1px solid var(--rule);
+		color: var(--muted);
+		font-size: var(--step--1);
+	}
+
 	.lang {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
 	}
 
-	.dot {
-		width: 0.55rem;
-		height: 0.55rem;
-		border-radius: 50%;
-		background: var(--lang);
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 28%, transparent);
-		flex: none;
+	.actions {
+		display: flex;
+		gap: 0.5rem;
 	}
 
-	.meta {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.1rem 1.15rem;
-		color: var(--muted);
-		padding-top: 0.55rem;
-		border-top: 1px solid var(--rule);
-		margin-top: auto;
+	.action {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		flex: 1;
+		padding: 0.5rem 0.75rem;
+		font-size: var(--step--1);
+		font-weight: 500;
+		text-decoration: none;
+		color: var(--ink);
+		border: 1px solid var(--rule-strong);
+		border-radius: 999px;
+		transition:
+			border-color 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.action:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+
+	.action.primary {
+		color: var(--paper);
+		background: var(--accent);
+		border-color: var(--accent);
+	}
+
+	.action.primary:hover {
+		color: var(--paper);
+		filter: brightness(1.1);
+	}
+
+	.pulse {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: currentColor;
+		animation: beat 2s ease-in-out infinite;
+	}
+
+	@keyframes beat {
+		50% {
+			opacity: 0.25;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.turner,
+		.face {
+			transition: none;
+		}
+
+		.pulse {
+			animation: none;
+		}
+
+		.turn svg,
+		.turn:hover svg {
+			transition: none;
+			transform: none;
+		}
 	}
 </style>
