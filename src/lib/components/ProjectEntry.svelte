@@ -1,18 +1,15 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import type { Project } from '$lib/types/project';
-	import { reveal } from '$lib/actions/reveal';
 	import { base } from '$app/paths';
 	import { languageColor } from '$lib/data/languageColors';
 
 	let {
 		project,
-		index,
 		current = true,
 		graphLanguages = []
 	}: {
 		project: Project;
-		index: number;
 		/** Whether this card is the one in the middle of the carousel. */
 		current?: boolean;
 		graphLanguages?: string[];
@@ -96,7 +93,7 @@
 	read by a crawler, and the face that is turned away is inert so the keyboard and a
 	screen reader never land on it.
 -->
-<article class="card" style="--lang: {lang}" use:reveal={Math.min(index, 3) * 60}>
+<article class="card" style="--lang: {lang}">
 	<div class="turner" class:flipped>
 		<section class="face front" inert={flipped} aria-label={name}>
 			<div class="shot">
