@@ -1,6 +1,7 @@
 <script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
 	import { circularOffset, visibleHalf, wrap } from '$lib/carousel';
+	import { reveal } from '$lib/actions/reveal';
 
 	let {
 		label,
@@ -15,7 +16,7 @@
 		slide: Snippet<[T, number, boolean]>;
 	} = $props();
 
-	/** Time on each slide while it plays by itself. */
+	/** Time on each slide while it plays by itself, which is what the progress bar counts. */
 	const DWELL_MS = 4500;
 	/** A sideways drag of at least this many pixels turns the row. */
 	const SWIPE_PX = 45;
@@ -32,17 +33,12 @@
 	let focused = $state(false);
 	let dragging = $state(false);
 	let onScreen = $state(false);
-	/* Which way the row last turned, and how many times: each move restarts the hop. */
-	let direction = $state<1 | -1>(1);
-	let moves = $state(0);
 	let startX = 0;
 	let moved = false;
 
 	const playing = $derived(wantsPlay && !hovered && !focused && !dragging && onScreen && count > 1);
 
 	function go(way: -1 | 1) {
-		direction = way;
-		moves += 1;
 		active = wrap(active, way, count);
 	}
 
@@ -106,16 +102,11 @@
 			visible.disconnect();
 		};
 	});
-
-	$effect(() => {
-		if (!playing) return;
-		const timer = setInterval(() => go(1), DWELL_MS);
-		return () => clearInterval(timer);
-	});
 </script>
 
 <section
 	class="carousel"
+	use:reveal
 	aria-roledescription="carousel"
 	aria-label={label}
 	onmouseenter={() => (hovered = true)}
@@ -138,23 +129,24 @@
 		tabindex="0"
 		role="group"
 		aria-label="{label}, use the arrow keys to move"
-		style="--half: {half}; --dir: {direction}{moves > 0
-			? `; --hop: hop-${moves % 2 ? 'a' : 'b'}`
-			: ''}"
+		style="--half: {half}"
 	>
 		{#each items as item, index (index)}
 			{@const offset = circularOffset(index, active, count)}
-			{@const gone = Math.abs(offset) > half}
+			{@const away = Math.abs(offset)}
+			{@const staging = away === half + 1}
+			{@const gone = away > half + 1}
 			<div
 				class="slide"
 				class:current={offset === 0}
+				class:staging
 				class:gone
 				style="--d: {offset}; --abs: {Math.abs(offset)}"
 			>
 				<div class="content" inert={live && offset !== 0}>
 					{@render slide(item, index, offset === 0)}
 				</div>
-				{#if live && offset !== 0 && !gone}
+				{#if live && offset !== 0 && !gone && !staging}
 					<button
 						class="peek"
 						type="button"
@@ -166,6 +158,20 @@
 			</div>
 		{/each}
 	</div>
+
+	<!-- The time until it moves on by itself. The bar is the clock: when it fills, the row
+	     turns, and it stands still whenever the row does. It starts again after any move. -->
+	{#if live && count > 1}
+		<div class="progress" class:idle={!wantsPlay} style="--dwell: {DWELL_MS}ms" aria-hidden="true">
+			{#key active}
+				<span
+					class="fill"
+					style:animation-play-state={playing ? 'running' : 'paused'}
+					onanimationend={() => go(1)}
+				></span>
+			{/key}
+		</div>
+	{/if}
 
 	{#if live}
 		<div class="controls">
@@ -264,39 +270,31 @@
 		transform: translateX(calc(var(--d) * var(--step))) translateZ(calc(var(--abs) * -130px))
 			rotateY(clamp(-48deg, calc(var(--d) * -30deg), 48deg)) scale(calc(1 - var(--abs) * 0.04));
 		opacity: calc(1 - var(--abs) * 0.16);
+		filter: drop-shadow(0 0 0 transparent);
 		/* A little overshoot, and the further a card is from the middle the later it sets
-		   off, so a move runs through the row like a wave. */
+		   off, so a move runs through the row like a wave. The shadow grows and fades with
+		   it rather than appearing. */
 		transition:
 			transform 0.85s cubic-bezier(0.3, 1.18, 0.4, 1) calc(var(--abs) * 35ms),
-			opacity 0.7s ease calc(var(--abs) * 35ms);
-		/* Each move, the card also hops: up and over on a slight tilt, then down again.
-		   The name alternates so the same animation can start again on the next move. */
-		animation: var(--hop, none) 0.9s cubic-bezier(0.4, 0, 0.3, 1) calc(var(--abs) * 35ms);
+			opacity 0.7s ease calc(var(--abs) * 35ms),
+			filter 0.7s ease;
 		will-change: transform;
 	}
 
-	@keyframes -global-hop-a {
-		35% {
-			translate: 0 -26px;
-			rotate: calc(var(--dir) * -3deg);
-		}
+	/* The card waiting just outside the row. It is there but not seen, so when the row
+	   moves it glides in and fades up instead of appearing. */
+	.live .slide.staging {
+		opacity: 0;
+		pointer-events: none;
 	}
 
-	@keyframes -global-hop-b {
-		35% {
-			translate: 0 -26px;
-			rotate: calc(var(--dir) * -3deg);
-		}
-	}
-
-	/* A slide beyond the edge waits out of sight and jumps to its place at once, so one
-	   going round the back of the loop is never seen crossing the stage. */
+	/* A slide further out waits out of sight and jumps to its place at once, so one going
+	   round the back of the loop is never seen crossing the stage. */
 	.live .slide.gone {
 		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
 		transition: none;
-		animation: none;
 	}
 
 	/* The shade that makes a far slide sit behind a near one. */
@@ -324,6 +322,38 @@
 		border-radius: 10px;
 		background: transparent;
 		cursor: pointer;
+	}
+
+	.progress {
+		justify-self: center;
+		width: min(15.5rem, 70%);
+		height: 3px;
+		overflow: hidden;
+		background: var(--rule-strong);
+		border-radius: 999px;
+		transition: opacity 0.3s ease;
+	}
+
+	.progress.idle {
+		opacity: 0.4;
+	}
+
+	.fill {
+		display: block;
+		width: 100%;
+		height: 100%;
+		background: var(--accent);
+		transform-origin: 0 50%;
+		animation: fill var(--dwell) linear forwards;
+	}
+
+	@keyframes fill {
+		from {
+			transform: scaleX(0);
+		}
+		to {
+			transform: scaleX(1);
+		}
 	}
 
 	.controls {
