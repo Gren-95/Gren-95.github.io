@@ -10,6 +10,20 @@ import type { CuratedProject } from '$lib/types/project';
  */
 export const projects: CuratedProject[] = [
 	{
+		repo: 'lanping',
+		tagline: 'Finds every device on your network. A desktop app in Rust, no admin rights.',
+		period: '2026',
+		summary:
+			'Finding out what is on a home network usually means a root shell and nmap, or a router page that lists half of it. LanPing scans the network without admin rights, names each device from what it announces about itself, and shows its vendor, latency and open ports. It has grown into a small toolbox: Wi-Fi channels, trace and latency graphs, speed tests, DNS, TLS and email checks, SNMP traffic, UPnP port forwards and syslog. A command line version runs the same checks from scripts and cron. Builds for Linux, Windows and macOS are on the releases page; the macOS one is untested.',
+		exposes: ['Rust', 'Iced', 'tokio', 'SNMP', 'mDNS'],
+		shot: {
+			src: 'shots/lanping.webp',
+			width: 1200,
+			height: 535,
+			alt: 'LanPing listing the devices of a made-up network with their latency, vendor, open ports and type'
+		}
+	},
+	{
 		repo: 'ha-relay-panel',
 		tagline: 'Turns relays into simple thermostats in Home Assistant.',
 		period: '2026',
