@@ -284,14 +284,14 @@
 		will-change: transform;
 	}
 
-	@keyframes hop-a {
+	@keyframes -global-hop-a {
 		35% {
 			translate: 0 -26px;
 			rotate: calc(var(--dir) * -3deg);
 		}
 	}
 
-	@keyframes hop-b {
+	@keyframes -global-hop-b {
 		35% {
 			translate: 0 -26px;
 			rotate: calc(var(--dir) * -3deg);
