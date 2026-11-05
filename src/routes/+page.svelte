@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Carousel from '$lib/components/Carousel.svelte';
 	import ProjectEntry from '$lib/components/ProjectEntry.svelte';
 	import LanguageMix from '$lib/components/LanguageMix.svelte';
 	import ModelGrid from '$lib/components/ModelGrid.svelte';
@@ -280,11 +281,11 @@
 		</div>
 		<LanguageMix languages={data.languages} classified={data.classified} />
 
-		<div class="grid">
+		<Carousel label="Projects" count={data.projects.length}>
 			{#each data.projects as project, index (project.repo)}
 				<ProjectEntry {project} {index} />
 			{/each}
-		</div>
+		</Carousel>
 	</section>
 	<section class="shell section" id="upstream">
 		<div class="section-head">
@@ -425,7 +426,7 @@
 	.bar {
 		display: flex;
 		align-items: center;
-		gap: 1.5rem;
+		gap: clamp(0.85rem, 2vw, 1.5rem);
 		padding-block: 0.85rem;
 	}
 
@@ -440,13 +441,19 @@
 
 	.nav {
 		display: none;
-		gap: 1.5rem;
+		gap: clamp(0.85rem, 2vw, 1.5rem);
+		/* Shrinks before the bar does, and scrolls instead of wrapping a label. */
+		min-width: 0;
+		overflow-x: auto;
+		scrollbar-width: none;
 	}
 
 	.nav a {
+		flex: none;
 		color: var(--muted);
 		text-decoration: none;
 		font-weight: 500;
+		white-space: nowrap;
 	}
 
 	.nav a:hover {
@@ -768,16 +775,6 @@
 		color: var(--muted);
 		margin-top: 0.5rem;
 		max-width: 58ch;
-	}
-
-	/* Every row as tall as the tallest, so all cards match and their tags
-	   and footers line up. Read more opens over a card, not below it, so
-	   rows never change height. */
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
-		grid-auto-rows: 1fr;
-		gap: 1.1rem;
 	}
 
 	.contributions {

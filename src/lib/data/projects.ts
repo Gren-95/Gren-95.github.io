@@ -19,7 +19,7 @@ export const projects: CuratedProject[] = [
 		shot: {
 			src: 'shots/lanping.webp',
 			width: 1200,
-			height: 535,
+			height: 727,
 			alt: 'LanPing listing the devices of a made-up network with their latency, vendor, open ports and type'
 		}
 	},
