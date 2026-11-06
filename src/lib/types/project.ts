@@ -1,3 +1,5 @@
+import type { ToolBadge } from '$lib/resolveToolIcons';
+
 /** A curated catalogue entry, written by hand. */
 export interface CuratedProject {
 	/** GitHub repository name, also the catalogue entry's title. */
@@ -29,6 +31,13 @@ export interface RepoFacts {
 
 /** A curated entry merged with its live facts, ready to render. */
 export type Project = CuratedProject & RepoFacts;
+
+/** A project with the logo and brand colour of everything it lists, resolved at build time. */
+export type ProjectCard = Project & {
+	tools: ToolBadge[];
+	/** The mark of the project's main language, when GitHub names one. */
+	languageBadge: ToolBadge | null;
+};
 
 /** An upstream contribution to somebody else's project. */
 export interface Contribution {

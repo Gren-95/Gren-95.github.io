@@ -105,9 +105,6 @@
 	// Non-breaking spaces keep the stagger's inline-block letters from collapsing.
 	const letters = profile.name.split('').map((letter) => (letter === ' ' ? '\u00A0' : letter));
 
-	/* Tags that name a language in the graph above take that language's colour. */
-	const graphLanguages = $derived(data.languages.map((language) => language.name));
-
 	const sections = $derived([
 		{ id: 'work', label: 'Work' },
 		{ id: 'projects', label: 'Projects' },
@@ -290,7 +287,7 @@
 			itemLabel={(project) => project.title ?? project.repo}
 		>
 			{#snippet slide(project, _index, current)}
-				<ProjectEntry {project} {current} {graphLanguages} />
+				<ProjectEntry {project} {current} />
 			{/snippet}
 		</Carousel>
 	</section>
@@ -331,8 +328,9 @@
 		<div class="section-head">
 			<h2>3D modelling</h2>
 			<p class="section-note">
-				Three of nine coursework models. Tinkercad and SketchUp for the set exercises, Blender when
-				the set tool was Windows-only. Printable designs are published on
+				A selection of coursework models. Tinkercad and SketchUp for the set exercises, Blender when
+				the set tool was Windows-only. Where there is a file, turn the model around in 3D. Printable
+				designs are published on
 				<a href={profile.printables} rel="noopener">Printables</a>.
 			</p>
 		</div>
