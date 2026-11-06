@@ -7,21 +7,14 @@ export function circularOffset(index: number, active: number, count: number): nu
 	return offset;
 }
 
-/** The slide after `active`, going round to the first after the last. */
-export function wrap(active: number, direction: -1 | 1, count: number): number {
-	if (count <= 0) return 0;
-	return (((active + direction) % count) + count) % count;
-}
-
 /**
- * How many slides to show on each side of the centre one. Each step sideways moves a slide
- * `step` pixels, and a slide is shown while its centre is still inside the stage.
+ * How many slides sit on each side of the centre one inside the focus area. The area is an
+ * odd number of whole slides, so the middle one is its exact centre; a slide that would
+ * only half fit stays outside it. `step` is the width of one slide with its gap.
  */
-export function visibleHalf(stageWidth: number, step: number, count: number): number {
-	if (step <= 0) return 1;
-	const fits = Math.floor(stageWidth / 2 / step);
-	return Math.max(1, Math.min(fits, Math.floor(count / 2), MAX_HALF));
+export function focusHalf(stageWidth: number, step: number, count: number): number {
+	if (step <= 0) return 0;
+	const whole = Math.floor(stageWidth / step);
+	const half = Math.floor((whole - 1) / 2);
+	return Math.max(0, Math.min(half, Math.floor((count - 1) / 2)));
 }
-
-/** More than this many on a side stops adding anything the eye can tell apart. */
-const MAX_HALF = 4;

@@ -1,18 +1,17 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import type { Project } from '$lib/types/project';
+	import type { ProjectCard } from '$lib/types/project';
 	import { base } from '$app/paths';
 	import { languageColor } from '$lib/data/languageColors';
+	import ToolIcon from '$lib/components/ToolIcon.svelte';
 
 	let {
 		project,
-		current = true,
-		graphLanguages = []
+		current = true
 	}: {
-		project: Project;
-		/** Whether this card is the one in the middle of the carousel. */
+		project: ProjectCard;
+		/** Whether this card is in focus in the carousel. */
 		current?: boolean;
-		graphLanguages?: string[];
 	} = $props();
 
 	const lang = $derived(languageColor(project.language));
@@ -21,11 +20,6 @@
 	const updated = $derived(
 		new Date(project.pushedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 	);
-
-	/** The colour of a tag that names a language in the graph, or nothing for any other tag. */
-	function tagColor(tag: string): string | undefined {
-		return graphLanguages.includes(tag) ? languageColor(tag) : undefined;
-	}
 
 	let flipped = $state(false);
 	let toBack: HTMLButtonElement | undefined = $state();
@@ -111,9 +105,10 @@
 				{/if}
 				<span class="pill period mono">{project.period}</span>
 				{#if project.language}
-					<span class="pill language mono"
-						><span class="dot" aria-hidden="true"></span>{project.language}</span
-					>
+					<span class="pill language mono">
+						{#if project.languageBadge}<ToolIcon badge={project.languageBadge} />{/if}
+						{project.language}
+					</span>
 				{/if}
 			</div>
 
@@ -122,8 +117,8 @@
 				<p class="tagline">{project.tagline}</p>
 
 				<ul class="stack" bind:this={stack} aria-label="Built with">
-					{#each project.exposes as tool (tool)}
-						<li data-chip class:tagged={tagColor(tool)} style:--tag={tagColor(tool)}>{tool}</li>
+					{#each project.tools as tool (tool.name)}
+						<li data-chip style:--tag={tool.hex}><ToolIcon badge={tool} />{tool.name}</li>
 					{/each}
 					<li class="more-tags mono" data-more hidden aria-hidden="true"></li>
 				</ul>
@@ -162,8 +157,8 @@
 			<p class="summary">{project.summary}</p>
 
 			<ul class="built" aria-label="Built with">
-				{#each project.exposes as tool (tool)}
-					<li class:tagged={tagColor(tool)} style:--tag={tagColor(tool)}>{tool}</li>
+				{#each project.tools as tool (tool.name)}
+					<li style:--tag={tool.hex}><ToolIcon badge={tool} />{tool.name}</li>
 				{/each}
 			</ul>
 
@@ -171,7 +166,10 @@
 				<span>{project.period}</span>
 				<span>Updated {updated}</span>
 				{#if project.language}
-					<span class="lang"><span class="dot" aria-hidden="true"></span>{project.language}</span>
+					<span class="lang">
+						{#if project.languageBadge}<ToolIcon badge={project.languageBadge} />{/if}
+						{project.language}
+					</span>
 				{/if}
 				{#if project.stars > 0}<span>{project.stars} ★</span>{/if}
 			</p>
@@ -189,16 +187,18 @@
 </article>
 
 <style>
+	/* A wide card: the picture on the left and the words on the right. In a narrow space
+	   (a phone) it stands up instead, picture over words. */
 	.card {
 		/* The room the turn needs to look like a turn rather than a squash. */
 		perspective: 1100px;
-		height: 29rem;
+		container-type: inline-size;
 	}
 
 	.turner {
 		position: relative;
 		display: grid;
-		height: 100%;
+		height: 18rem;
 		transform-style: preserve-3d;
 		/* Symmetric, so the card is edge-on at exactly half the time, when the faces swap. */
 		transition: transform 0.75s cubic-bezier(0.42, 0, 0.58, 1);
@@ -234,10 +234,21 @@
 		visibility: hidden;
 	}
 
+	/* The story: the words on the left, what it is built with and where to find it on the
+	   right. */
 	.back {
+		display: grid;
+		grid-template-columns: 1.3fr 1fr;
+		grid-template-areas:
+			'head head'
+			'summary built'
+			'summary facts'
+			'summary actions';
+		grid-template-rows: auto minmax(0, 1fr) auto auto;
+		column-gap: 1.4rem;
+		row-gap: 0.8rem;
 		transform: rotateY(180deg);
-		padding: 1.1rem;
-		gap: 0.8rem;
+		padding: 1.1rem 1.2rem;
 		background: linear-gradient(
 			180deg,
 			color-mix(in oklab, var(--lang) 16%, var(--raised)),
@@ -256,10 +267,13 @@
 
 	/* ---- front ---- */
 
+	.front {
+		flex-direction: row;
+	}
+
 	.shot {
 		position: relative;
-		flex: none;
-		height: 11.5rem;
+		flex: 0 0 44%;
 		background: color-mix(in oklab, var(--lang) 14%, var(--paper));
 	}
 
@@ -276,7 +290,7 @@
 		content: '';
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(to top, var(--raised), transparent 42%);
+		background: linear-gradient(to left, var(--raised), transparent 45%);
 		pointer-events: none;
 	}
 
@@ -314,22 +328,14 @@
 		right: 0.65rem;
 	}
 
-	.dot {
-		width: 0.55rem;
-		height: 0.55rem;
-		border-radius: 50%;
-		background: var(--lang);
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 28%, transparent);
-		flex: none;
-	}
-
 	.body {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
 		gap: 0.6rem;
+		min-width: 0;
 		min-height: 0;
-		padding: 0.1rem 1.05rem 1.15rem;
+		padding: 1rem 1.2rem 1.15rem 0.4rem;
 	}
 
 	.title {
@@ -385,9 +391,14 @@
 		height: var(--chip);
 	}
 
+	/* A tag: the logo in its brand colour, the name in ink, and a faint wash and ring of
+	   the same brand, so each reads at a glance and colour is never the only cue. */
 	.stack li,
 	.built li {
 		flex: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
 		max-width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -395,31 +406,11 @@
 		line-height: 1.2;
 		font-family: var(--mono);
 		font-size: var(--step--1);
-		color: var(--accent);
-		background: var(--accent-wash);
-		border-radius: 999px;
-		padding: 0.15rem 0.65rem;
-	}
-
-	/* A tag that names a language in the graph wears that language's colour: a dot, a ring
-	   and a wash of it. The name is still written, so colour is never the only cue. */
-	.tagged {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
 		color: var(--ink);
-		background: color-mix(in oklab, var(--tag) 16%, var(--raised));
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tag) 55%, transparent);
-	}
-
-	.tagged::before {
-		content: '';
-		width: 0.5rem;
-		height: 0.5rem;
-		border-radius: 50%;
-		background: var(--tag);
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 28%, transparent);
-		flex: none;
+		background: color-mix(in oklab, var(--tag) 12%, var(--raised));
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tag) 38%, transparent);
+		border-radius: 999px;
+		padding: 0.15rem 0.7rem 0.15rem 0.5rem;
 	}
 
 	.stack .more-tags {
@@ -492,6 +483,7 @@
 	/* ---- back ---- */
 
 	.back-head {
+		grid-area: head;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -507,6 +499,7 @@
 	}
 
 	.summary {
+		grid-area: summary;
 		flex: 1;
 		min-height: 0;
 		margin: 0;
@@ -521,6 +514,8 @@
 	}
 
 	.built {
+		grid-area: built;
+		align-content: flex-start;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.35rem;
@@ -530,6 +525,7 @@
 	}
 
 	.facts {
+		grid-area: facts;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.2rem 0.9rem;
@@ -547,6 +543,7 @@
 	}
 
 	.actions {
+		grid-area: actions;
 		display: flex;
 		gap: 0.5rem;
 	}
@@ -596,6 +593,33 @@
 	@keyframes beat {
 		50% {
 			opacity: 0.25;
+		}
+	}
+
+	/* In a narrow space the card stands up: picture over words, the story in one column. Last,
+	   so it wins over the wide layout above. */
+	@container (max-width: 30rem) {
+		.turner {
+			height: 31rem;
+		}
+
+		.front {
+			flex-direction: column;
+		}
+
+		.shot {
+			flex: none;
+			height: 11.5rem;
+		}
+
+		.shot::after {
+			background: linear-gradient(to top, var(--raised), transparent 42%);
+		}
+
+		.back {
+			grid-template-columns: 1fr;
+			grid-template-areas: 'head' 'summary' 'built' 'facts' 'actions';
+			grid-template-rows: auto minmax(0, 1fr) auto auto auto;
 		}
 	}
 </style>

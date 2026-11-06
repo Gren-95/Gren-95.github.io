@@ -14,7 +14,10 @@ const seoFiles = import.meta.glob('/static/*.{xml,txt}', {
 
 function assetPaths() {
 	const shots = projects.flatMap((project) => (project.shot ? [project.shot.src] : []));
-	const modelImages = models.map((model) => model.image.src);
+	const modelImages = models.flatMap((model) => [
+		model.image.src,
+		...(model.glb ? [model.glb.src] : [])
+	]);
 	const logos = [...work, ...education].flatMap((post) => (post.logo ? [post.logo.src] : []));
 	return [...new Set([...shots, ...modelImages, ...logos])];
 }

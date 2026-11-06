@@ -1,6 +1,7 @@
 <script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
-	import { circularOffset, visibleHalf, wrap } from '$lib/carousel';
+	import EmblaCarousel, { type EmblaCarouselType, type EmblaOptionsType } from 'embla-carousel';
+	import { circularOffset, focusHalf } from '$lib/carousel';
 	import { reveal } from '$lib/actions/reveal';
 
 	let {
@@ -17,89 +18,72 @@
 	} = $props();
 
 	/** Time on each slide while it plays by itself, which is what the progress bar counts. */
-	const DWELL_MS = 4500;
-	/** A sideways drag of at least this many pixels turns the row. */
-	const SWIPE_PX = 45;
+	const DWELL_MS = 9000;
+
+	const options: EmblaOptionsType = { loop: true, align: 'center', skipSnaps: false };
 
 	const count = $derived(items.length);
 
+	let api: EmblaCarouselType | undefined = $state();
 	let active = $state(0);
-	let stage: HTMLDivElement | undefined = $state();
-	let half = $state(2);
-	/* Without script the row is a plain scrolling strip; the 3D stage starts once it runs. */
-	let live = $state(false);
+	/* Slides on each side of the centre one that are in focus with it. */
+	let half = $state(0);
+	/* The width of the page without its scrollbar, which the row stretches to. */
+	let bleed = $state(0);
 	let wantsPlay = $state(true);
-	let hovered = $state(false);
 	let focused = $state(false);
 	let dragging = $state(false);
 	let onScreen = $state(false);
-	let startX = 0;
-	let moved = false;
+	let stage: HTMLDivElement | undefined = $state();
 
-	const playing = $derived(wantsPlay && !hovered && !focused && !dragging && onScreen && count > 1);
+	/* Without script the row is a plain scrolling strip; Embla takes over once it runs. */
+	const live = $derived(api !== undefined);
+	const playing = $derived(wantsPlay && !focused && !dragging && onScreen && count > 1);
 
-	function go(way: -1 | 1) {
-		active = wrap(active, way, count);
+	function onkeydown(event: KeyboardEvent) {
+		if (event.key === 'ArrowRight') {
+			event.preventDefault();
+			api?.scrollNext();
+		} else if (event.key === 'ArrowLeft') {
+			event.preventDefault();
+			api?.scrollPrev();
+		}
+	}
+
+	/* Embla swallows the click that ends a drag, so this only runs for a real choice. */
+	function show(index: number) {
+		api?.scrollTo(index);
 	}
 
 	function measure() {
 		const first = stage?.querySelector<HTMLElement>('.slide');
 		if (!stage || !first) return;
-		half = visibleHalf(stage.clientWidth, first.offsetWidth * STEP_RATIO, count);
-	}
-
-	/** One step sideways, as a share of a slide's width. Keep in step with --step below. */
-	const STEP_RATIO = 0.8;
-
-	function onkeydown(event: KeyboardEvent) {
-		if (event.key === 'ArrowRight') {
-			event.preventDefault();
-			go(1);
-		} else if (event.key === 'ArrowLeft') {
-			event.preventDefault();
-			go(-1);
-		}
-	}
-
-	function onpointerdown(event: PointerEvent) {
-		startX = event.clientX;
-		moved = false;
-		dragging = true;
-	}
-
-	function onpointerup(event: PointerEvent) {
-		if (!dragging) return;
-		dragging = false;
-		const travelled = event.clientX - startX;
-		if (Math.abs(travelled) >= SWIPE_PX) {
-			moved = true;
-			go(travelled < 0 ? 1 : -1);
-		}
-	}
-
-	function show(index: number) {
-		// A drag that ended on a slide is a swipe, not a choice of that slide.
-		if (moved) {
-			moved = false;
-			return;
-		}
-		active = index;
+		bleed = document.documentElement.clientWidth;
+		half = focusHalf(bleed, first.offsetWidth, count);
 	}
 
 	$effect(() => {
 		const element = stage;
 		if (!element) return;
-		live = true;
+
+		const embla = EmblaCarousel(element, options);
+		active = embla.selectedScrollSnap();
+		embla.on('select', () => (active = embla.selectedScrollSnap()));
+		embla.on('pointerDown', () => (dragging = true));
+		embla.on('pointerUp', () => (dragging = false));
+		api = embla;
+
 		measure();
 		const resize = new ResizeObserver(measure);
-		resize.observe(element);
-		// Only turn while it can be seen, so it is not moving unseen or wasting the battery.
+		resize.observe(document.documentElement);
+		// Only move while it can be seen, so it is not moving unseen or wasting the battery.
 		const visible = new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting));
 		visible.observe(element);
-
 		return () => {
 			resize.disconnect();
 			visible.disconnect();
+			embla.destroy();
+			api = undefined;
 		};
 	});
 </script>
@@ -109,8 +93,6 @@
 	use:reveal
 	aria-roledescription="carousel"
 	aria-label={label}
-	onmouseenter={() => (hovered = true)}
-	onmouseleave={() => (hovered = false)}
 	onfocusin={() => (focused = true)}
 	onfocusout={() => (focused = false)}
 >
@@ -122,41 +104,32 @@
 		class="viewport"
 		class:live
 		bind:this={stage}
+		style:width={live && bleed ? `${bleed}px` : undefined}
+		style:margin-left={live && bleed ? `calc(50% - ${bleed / 2}px)` : undefined}
 		{onkeydown}
-		{onpointerdown}
-		{onpointerup}
-		onpointercancel={() => (dragging = false)}
 		tabindex="0"
 		role="group"
 		aria-label="{label}, use the arrow keys to move"
-		style="--half: {half}"
 	>
-		{#each items as item, index (index)}
-			{@const offset = circularOffset(index, active, count)}
-			{@const away = Math.abs(offset)}
-			{@const staging = away === half + 1}
-			{@const gone = away > half + 1}
-			<div
-				class="slide"
-				class:current={offset === 0}
-				class:staging
-				class:gone
-				style="--d: {offset}; --abs: {Math.abs(offset)}"
-			>
-				<div class="content" inert={live && offset !== 0}>
-					{@render slide(item, index, offset === 0)}
+		<div class="container">
+			{#each items as item, index (index)}
+				{@const current = Math.abs(circularOffset(index, active, count)) <= half}
+				<div class="slide" class:current>
+					<div class="content" inert={live && !current}>
+						{@render slide(item, index, current)}
+					</div>
+					{#if live && !current}
+						<button
+							class="peek"
+							type="button"
+							tabindex="-1"
+							aria-label="Show {itemLabel(item)}"
+							onclick={() => show(index)}
+						></button>
+					{/if}
 				</div>
-				{#if live && offset !== 0 && !gone && !staging}
-					<button
-						class="peek"
-						type="button"
-						tabindex="-1"
-						aria-label="Show {itemLabel(item)}"
-						onclick={() => show(index)}
-					></button>
-				{/if}
-			</div>
-		{/each}
+			{/each}
+		</div>
 	</div>
 
 	<!-- The time until it moves on by itself. The bar is the clock: when it fills, the row
@@ -167,7 +140,7 @@
 				<span
 					class="fill"
 					style:animation-play-state={playing ? 'running' : 'paused'}
-					onanimationend={() => go(1)}
+					onanimationend={() => api?.scrollNext()}
 				></span>
 			{/key}
 		</div>
@@ -175,7 +148,7 @@
 
 	{#if live}
 		<div class="controls">
-			<button type="button" aria-label="Previous project" onclick={() => go(-1)}>
+			<button type="button" aria-label="Previous project" onclick={() => api?.scrollPrev()}>
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
 			</button>
 			<button
@@ -190,7 +163,7 @@
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z" /></svg>
 				{/if}
 			</button>
-			<button type="button" aria-label="Next project" onclick={() => go(1)}>
+			<button type="button" aria-label="Next project" onclick={() => api?.scrollNext()}>
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
 			</button>
 			<!-- Read out only when it is not already changing by itself. -->
@@ -205,15 +178,13 @@
 	.carousel {
 		display: grid;
 		gap: 0.75rem;
-		/* The width of a card, and how far one step sideways moves the next. */
-		--slide: 15.5rem;
-		--step: calc(var(--slide) * 0.8);
+		/* The width of a card, and the space between two cards. */
+		--slide: min(38rem, 88vw);
+		--gap: 1rem;
 	}
 
 	/* Without script: an ordinary strip that scrolls and snaps. */
 	.viewport {
-		display: flex;
-		gap: 1rem;
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
 		padding-block: 0.4rem 0.9rem;
@@ -227,9 +198,15 @@
 		border-radius: 10px;
 	}
 
+	.container {
+		display: flex;
+	}
+
 	.slide {
 		position: relative;
-		flex: 0 0 var(--slide);
+		flex: 0 0 calc(var(--slide) + var(--gap));
+		/* Half the gap each side, so the card sits in the exact middle of its slide. */
+		padding-inline: calc(var(--gap) / 2);
 		scroll-snap-align: start;
 	}
 
@@ -241,81 +218,62 @@
 		height: 100%;
 	}
 
-	/* With script: a stage in perspective. Every slide sits in the same cell and is moved
-	   out from the centre by its offset d, tilted towards the middle, pushed back and
-	   dimmed in proportion to how far it is. */
+	/* With script: Embla moves the container, so the strip stops scrolling by itself. The
+	   middle card is full size; the others sit a little back and dimmer. */
 	.viewport.live {
-		display: grid;
-		justify-items: center;
-		overflow: hidden;
+		/* Clipped, not hidden: a hidden box can still be scrolled sideways by the script or by
+		   focus, and a row that has slid off its middle is no longer centred. */
+		overflow: clip;
 		scroll-snap-type: none;
-		perspective: 1200px;
-		perspective-origin: 50% 40%;
-		/* Room for the tilted slides and the centre one's shadow. */
-		padding: 1.5rem 0 2.25rem;
-		touch-action: pan-y;
+		touch-action: pan-y pinch-zoom;
 		user-select: none;
 		cursor: grab;
+		/* Room for the centre card's shadow. */
+		padding: 1.5rem 0 2.25rem;
 	}
 
 	.viewport.live:active {
 		cursor: grabbing;
 	}
 
-	.live .slide {
-		grid-area: 1 / 1;
-		width: var(--slide);
-		flex: none;
-		z-index: calc(10 - var(--abs));
-		transform: translateX(calc(var(--d) * var(--step))) translateZ(calc(var(--abs) * -130px))
-			rotateY(clamp(-48deg, calc(var(--d) * -30deg), 48deg)) scale(calc(1 - var(--abs) * 0.04));
-		opacity: calc(1 - var(--abs) * 0.16);
-		filter: drop-shadow(0 0 0 transparent);
-		/* A little overshoot, and the further a card is from the middle the later it sets
-		   off, so a move runs through the row like a wave. The shadow grows and fades with
-		   it rather than appearing. */
+	.live .content {
+		transform: scale(0.9);
+		opacity: 0.6;
 		transition:
-			transform 0.85s cubic-bezier(0.3, 1.18, 0.4, 1) calc(var(--abs) * 35ms),
-			opacity 0.7s ease calc(var(--abs) * 35ms),
-			filter 0.7s ease;
-		will-change: transform;
+			transform 0.5s cubic-bezier(0.3, 1.18, 0.4, 1),
+			opacity 0.4s ease;
+		will-change: transform, opacity;
 	}
 
-	/* The card waiting just outside the row. It is there but not seen, so when the row
-	   moves it glides in and fades up instead of appearing. */
-	.live .slide.staging {
-		opacity: 0;
-		pointer-events: none;
+	.live .slide.current .content {
+		transform: none;
+		opacity: 1;
 	}
 
-	/* A slide further out waits out of sight and jumps to its place at once, so one going
-	   round the back of the loop is never seen crossing the stage. */
-	.live .slide.gone {
-		opacity: 0;
-		visibility: hidden;
-		pointer-events: none;
-		transition: none;
+	/* The shadow under the cards in focus. It is a layer of its own that only fades, because
+	   animating a blurred filter on a card this large is what made the row stutter. */
+	.live .slide {
+		isolation: isolate;
 	}
 
-	/* The shade that makes a far slide sit behind a near one. */
-	.live .slide::after {
+	.live .slide::before {
 		content: '';
 		position: absolute;
-		inset: 0;
-		border-radius: 10px;
-		background: var(--paper);
-		opacity: calc(var(--abs) * 0.2);
-		pointer-events: none;
-		transition: opacity 0.7s ease;
+		inset: 0 calc(var(--gap) / 2);
+		z-index: -1;
+		border-radius: 14px;
+		box-shadow: 0 22px 26px color-mix(in oklab, var(--ink) 22%, transparent);
+		opacity: 0;
+		transition: opacity 0.4s ease;
 	}
 
-	.live .slide.current {
-		filter: drop-shadow(0 22px 26px color-mix(in oklab, var(--ink) 22%, transparent));
+	.live .slide.current::before {
+		opacity: 1;
 	}
 
 	.peek {
 		position: absolute;
-		inset: 0;
+		inset: 0 calc(var(--gap) / 2);
 		z-index: 2;
 		padding: 0;
 		border: 0;
